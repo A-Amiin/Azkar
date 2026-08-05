@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { AppFooter } from "@/components/layout/app-footer";
 import { AppHeader } from "@/components/layout/app-header";
 import { FontPreferenceSync } from "@/components/layout/font-preference-sync";
+import { ThemePreferenceSync } from "@/components/layout/theme-preference-sync";
 import { ServiceWorkerRegistration } from "@/components/layout/service-worker-registration";
 import { SplashScreen } from "@/components/layout/splash-screen";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -65,7 +66,12 @@ type RootLayoutProps = Readonly<{
 
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
-    <html lang="ar" dir="rtl" className={cn("font-sans", tajawal.variable)}>
+    <html
+      lang="ar"
+      dir="rtl"
+      data-theme="light"
+      className={cn("font-sans", tajawal.variable)}
+    >
       <body className="flex min-h-dvh flex-col">
         <script
           type="application/ld+json"
@@ -90,6 +96,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
 
         <Toaster position="top-center" />
         <FontPreferenceSync />
+        <ThemePreferenceSync />
         <ServiceWorkerRegistration />
       </body>
     </html>

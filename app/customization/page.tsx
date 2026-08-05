@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { CounterStylePicker } from "@/app/customization/components/counter-style-picker";
 import { FontSizePicker } from "@/app/customization/components/font-size-picker";
+import { ThemePicker } from "@/app/customization/components/theme-picker";
 import { Separator } from "@/components/ui/separator";
 
 export const metadata: Metadata = {
@@ -28,6 +29,20 @@ export default function CustomizationPage() {
           </p>
         </div>
         <FontSizePicker />
+      </section>
+
+      <Separator />
+
+      <section className="space-y-4" aria-labelledby="theme-heading">
+        <div className="space-y-1">
+          <h2 id="theme-heading" className="font-heading text-xl font-bold">
+            المظهر
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            اختر المظهر الفاتح أو الداكن باستخدام ألوان Fresh Greens.
+          </p>
+        </div>
+        <ThemePicker />
       </section>
 
       <Separator />

@@ -175,8 +175,7 @@ a {
   }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
+html[data-theme="dark"] {
     --background: var(--evergreen);
     --foreground: var(--frosted-mint);
     --card: var(--pine-teal);
@@ -209,7 +208,6 @@ a {
     --sidebar-accent-foreground: var(--frosted-mint);
     --sidebar-border: var(--sea-green);
     --sidebar-ring: var(--mint-leaf);
-  }
 }
 
 @layer base {
