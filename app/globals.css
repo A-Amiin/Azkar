@@ -2,8 +2,6 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
-@custom-variant dark (&:is(.dark *));
-
 :root {
   --frosted-mint: #d8f3dc;
   --celadon-light: #b7e4c7;
@@ -165,39 +163,41 @@ a {
   }
 }
 
-.dark {
-  --background: var(--evergreen);
-  --foreground: var(--frosted-mint);
-  --card: var(--pine-teal);
-  --card-foreground: var(--frosted-mint);
-  --popover: var(--pine-teal);
-  --popover-foreground: var(--frosted-mint);
-  --primary: var(--mint-leaf);
-  --primary-foreground: var(--evergreen);
-  --secondary: var(--dark-emerald);
-  --secondary-foreground: var(--frosted-mint);
-  --muted: var(--dark-emerald);
-  --muted-foreground: var(--celadon-light);
-  --accent: var(--dark-emerald);
-  --accent-foreground: var(--frosted-mint);
-  --destructive: oklch(0.704 0.191 22.216);
-  --destructive-foreground: var(--evergreen);
-  --border: var(--sea-green);
-  --input: var(--sea-green);
-  --ring: var(--mint-leaf);
-  --chart-1: var(--celadon);
-  --chart-2: var(--mint-leaf-light);
-  --chart-3: var(--mint-leaf);
-  --chart-4: var(--sea-green);
-  --chart-5: var(--dark-emerald);
-  --sidebar: var(--pine-teal);
-  --sidebar-foreground: var(--frosted-mint);
-  --sidebar-primary: var(--mint-leaf);
-  --sidebar-primary-foreground: var(--evergreen);
-  --sidebar-accent: var(--dark-emerald);
-  --sidebar-accent-foreground: var(--frosted-mint);
-  --sidebar-border: var(--sea-green);
-  --sidebar-ring: var(--mint-leaf);
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: var(--evergreen);
+    --foreground: var(--frosted-mint);
+    --card: var(--pine-teal);
+    --card-foreground: var(--frosted-mint);
+    --popover: var(--pine-teal);
+    --popover-foreground: var(--frosted-mint);
+    --primary: var(--mint-leaf);
+    --primary-foreground: var(--evergreen);
+    --secondary: var(--dark-emerald);
+    --secondary-foreground: var(--frosted-mint);
+    --muted: var(--dark-emerald);
+    --muted-foreground: var(--celadon-light);
+    --accent: var(--dark-emerald);
+    --accent-foreground: var(--frosted-mint);
+    --destructive: oklch(0.704 0.191 22.216);
+    --destructive-foreground: var(--evergreen);
+    --border: var(--sea-green);
+    --input: var(--sea-green);
+    --ring: var(--mint-leaf);
+    --chart-1: var(--celadon);
+    --chart-2: var(--mint-leaf-light);
+    --chart-3: var(--mint-leaf);
+    --chart-4: var(--sea-green);
+    --chart-5: var(--dark-emerald);
+    --sidebar: var(--pine-teal);
+    --sidebar-foreground: var(--frosted-mint);
+    --sidebar-primary: var(--mint-leaf);
+    --sidebar-primary-foreground: var(--evergreen);
+    --sidebar-accent: var(--dark-emerald);
+    --sidebar-accent-foreground: var(--frosted-mint);
+    --sidebar-border: var(--sea-green);
+    --sidebar-ring: var(--mint-leaf);
+  }
 }
 
 @layer base {

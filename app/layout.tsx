@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
-import NextScript from "next/script";
 import "./globals.css";
 import { Tajawal } from "next/font/google";
 import { cn } from "@/lib/utils";
@@ -39,19 +38,6 @@ export const viewport: Viewport = {
   ],
 };
 
-// Applies .dark before first paint based on the OS preference, so there is
-// no flash of the wrong theme. Runs via next/script's beforeInteractive
-// strategy (fetched/executed before hydration, the framework-sanctioned
-// place for exactly this kind of theme-flash-prevention script). No manual
-// toggle exists yet, so this is the only place dark mode gets applied.
-const themeInitScript = `
-  try {
-    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      document.documentElement.classList.add('dark');
-    }
-  } catch (_) {}
-`;
-
 const structuredData = {
   "@context": "https://schema.org",
   "@graph": [
@@ -81,9 +67,6 @@ export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="ar" dir="rtl" className={cn("font-sans", tajawal.variable)}>
       <body>
-        <NextScript id="theme-init" strategy="beforeInteractive">
-          {themeInitScript}
-        </NextScript>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
