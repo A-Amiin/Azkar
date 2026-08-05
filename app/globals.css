@@ -1,26 +1,70 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --frosted-mint: #d8f3dc;
+  --celadon-light: #b7e4c7;
+  --celadon: #95d5b2;
+  --mint-leaf-light: #74c69d;
+  --mint-leaf: #52b788;
+  --sea-green: #40916c;
+  --dark-emerald: #2d6a4f;
+  --pine-teal: #1b4332;
+  --evergreen: #081c15;
+
+  --background: var(--frosted-mint);
+  --foreground: var(--evergreen);
+  --surface: #ffffff;
+  --primary: var(--sea-green);
+  --primary-foreground: #ffffff;
+  --border: var(--celadon-light);
 }
 
 @theme inline {
+  --color-frosted-mint: var(--frosted-mint);
+  --color-celadon-light: var(--celadon-light);
+  --color-celadon: var(--celadon);
+  --color-mint-leaf-light: var(--mint-leaf-light);
+  --color-mint-leaf: var(--mint-leaf);
+  --color-sea-green: var(--sea-green);
+  --color-dark-emerald: var(--dark-emerald);
+  --color-pine-teal: var(--pine-teal);
+  --color-evergreen: var(--evergreen);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-surface: var(--surface);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-border: var(--border);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  min-height: 100%;
+  background: var(--background);
 }
 
 body {
+  min-height: 100vh;
+  margin: 0;
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  text-rendering: optimizeLegibility;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
 }
