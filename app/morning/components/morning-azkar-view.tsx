@@ -1,7 +1,7 @@
 "use client";
 
-import { AzkarCard } from "@/components/shared/azkar-card";
 import { AzkarProgress } from "@/components/shared/azkar-progress";
+import { AzkarSequence } from "@/components/shared/azkar-sequence";
 import { useMorningProgress } from "@/app/morning/hooks/use-morning-progress";
 import type { Dhikr } from "@/types/azkar";
 
@@ -19,19 +19,12 @@ export function MorningAzkarView({ items }: MorningAzkarViewProps) {
   return (
     <div className="flex flex-col gap-6">
       <AzkarProgress completedCount={completedCount} totalCount={totalCount} />
-      <div className="flex flex-col gap-4">
-        {items.map((dhikr) => (
-          <AzkarCard
-            key={dhikr.id}
-            dhikr={dhikr}
-            counter={{
-              current: getCount(dhikr.id),
-              onIncrement: () => increment(dhikr.id, dhikr.count),
-              onReset: () => reset(dhikr.id),
-            }}
-          />
-        ))}
-      </div>
+      <AzkarSequence
+        items={items}
+        getCount={getCount}
+        increment={increment}
+        reset={reset}
+      />
     </div>
   );
 }
