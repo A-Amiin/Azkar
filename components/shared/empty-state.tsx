@@ -37,7 +37,9 @@ export function EmptyState({
         <EmptyDescription>{description}</EmptyDescription>
       </EmptyHeader>
       <EmptyContent>
-        <Button render={<Link href={actionHref} />}>{actionLabel}</Button>
+        <Button nativeButton={false} render={<Link href={actionHref} />}>
+          {actionLabel}
+        </Button>
       </EmptyContent>
     </Empty>
   );

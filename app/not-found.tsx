@@ -11,7 +11,9 @@ export default function NotFound() {
         title="الصفحة غير موجودة"
         description="الرابط الذي وصلت إليه غير صحيح أو لم يعد متاحًا."
       />
-      <Button render={<Link href="/" />}>العودة إلى الرئيسية</Button>
+      <Button nativeButton={false} render={<Link href="/" />}>
+        العودة إلى الرئيسية
+      </Button>
     </section>
   );
 }
