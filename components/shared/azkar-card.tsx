@@ -105,7 +105,7 @@ export function AzkarCard({ dhikr, counter }: AzkarCardProps) {
           ) : null}
         </CardContent>
 
-        <CardFooter className={cn(counterStyle === "balanced" ? "justify-center" : "justify-end")}>
+        <CardFooter className={cn(counter ? "justify-center" : "justify-end")}>
           {counter ? (
             <AzkarCounter
               current={counter.current}
