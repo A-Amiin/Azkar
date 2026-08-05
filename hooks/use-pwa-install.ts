@@ -33,12 +33,27 @@ function getServerSnapshot() {
   return false;
 }
 
+function isIOSDevice() {
+  return /iPad|iPhone|iPod/.test(navigator.userAgent);
+}
+
+// The UA never changes mid-session, so subscribe is a no-op — this still
+// gets useSyncExternalStore's hydration-safe swap (server snapshot `false`,
+// then the real value once the client's post-hydration render commits)
+// instead of risking a mismatch from reading `navigator` during render.
+function subscribeNever() {
+  return () => {};
+}
+
 interface UsePwaInstallResult {
   /** True once the browser has signaled the app is installable and the
    *  prompt hasn't been used/dismissed yet. */
   canInstall: boolean;
   /** True when already launched as an installed, standalone PWA. */
   isStandalone: boolean;
+  /** True on iOS Safari, which never fires `beforeinstallprompt` — callers
+   *  should show manual "Add to Home Screen" instructions instead. */
+  isIOS: boolean;
   /** Shows the native install prompt. Resolves to the user's choice, or
    *  `null` if no prompt was available (e.g. iOS Safari, which has no
    *  `beforeinstallprompt` — callers should fall back to manual instructions). */
@@ -51,6 +66,7 @@ export function usePwaInstall(): UsePwaInstallResult {
     isStandaloneDisplay,
     getServerSnapshot
   );
+  const isIOS = useSyncExternalStore(subscribeNever, isIOSDevice, getServerSnapshot);
 
   const [deferredEvent, setDeferredEvent] =
     useState<BeforeInstallPromptEvent | null>(null);
@@ -81,6 +97,7 @@ export function usePwaInstall(): UsePwaInstallResult {
   return {
     canInstall: deferredEvent !== null,
     isStandalone,
+    isIOS,
     promptInstall,
   };
 }

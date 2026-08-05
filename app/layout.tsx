@@ -6,7 +6,9 @@ import { Tajawal } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { AppFooter } from "@/components/layout/app-footer";
 import { AppHeader } from "@/components/layout/app-header";
+import { ServiceWorkerRegistration } from "@/components/layout/service-worker-registration";
 import { SplashScreen } from "@/components/layout/splash-screen";
+import { InstallPwaPrompt } from "@/components/shared/install-pwa-prompt";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
 import { siteConfig } from "@/lib/metadata";
@@ -96,11 +98,13 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <TooltipProvider>
           <SplashScreen />
           <AppHeader />
+          <InstallPwaPrompt />
           <main id="main-content">{children}</main>
           <AppFooter />
         </TooltipProvider>
 
         <Toaster position="top-center" />
+        <ServiceWorkerRegistration />
       </body>
     </html>
   );

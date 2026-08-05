@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { BrandMark } from "@/components/shared/brand-mark";
 import { MobileNavigation } from "@/components/layout/mobile-navigation";
+import { OfflineIndicator } from "@/components/shared/offline-indicator";
 import { NAV_ITEMS, SITE_NAME } from "@/lib/constants";
 
 export function AppHeader() {
@@ -28,7 +29,10 @@ export function AppHeader() {
           </ul>
         </nav>
 
-        <MobileNavigation />
+        <div className="flex items-center gap-2">
+          <OfflineIndicator />
+          <MobileNavigation />
+        </div>
       </div>
     </header>
   );

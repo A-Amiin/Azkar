@@ -1,5 +1,8 @@
 import { ImageResponse } from "next/og";
 
+// Required under output: "export" — without generateImageMetadata's
+// implicit static params, this route needs an explicit static marker.
+export const dynamic = "force-static";
 export const size = { width: 180, height: 180 };
 export const contentType = "image/png";
 
