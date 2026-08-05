@@ -8,7 +8,7 @@ import { NAV_ITEMS, SITE_NAME } from "@/lib/constants";
 export function AppHeader() {
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur-xs supports-backdrop-filter:bg-background/80">
-      <div className="mx-auto flex h-14 max-w-3xl items-center justify-between gap-4 px-4">
+      <div className="mx-auto flex h-14 w-full max-w-6xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
         <Link href="/" className="flex items-center gap-2 font-semibold">
           <BrandMark size={28} />
           <span className="text-sm sm:text-base">{SITE_NAME}</span>

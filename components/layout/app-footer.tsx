@@ -10,7 +10,7 @@ export function AppFooter() {
 
   return (
     <footer className="border-t border-border bg-card">
-      <div className="mx-auto flex max-w-3xl flex-col gap-4 px-4 py-6 text-sm text-muted-foreground">
+      <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 py-6 text-sm text-muted-foreground sm:px-6 lg:px-8">
         <nav aria-label="روابط التذييل">
           <ul className="flex flex-wrap gap-x-4 gap-y-2">
             {NAV_ITEMS.map(({ href, label }) => (
