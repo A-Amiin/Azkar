@@ -7,6 +7,7 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { AzkarCounter } from "@/components/shared/azkar-counter";
 import { useFavorites } from "@/hooks/use-favorites";
+import { useCounterPreference } from "@/hooks/use-counter-preference";
 import { cn } from "@/lib/utils";
 import type { Dhikr } from "@/types/azkar";
 
@@ -18,6 +19,7 @@ const CATEGORY_LABEL: Record<Dhikr["category"], string> = {
 interface AzkarCardCounter {
   current: number;
   onIncrement: () => void;
+  onReset: () => void;
 }
 
 interface AzkarCardProps {
@@ -35,6 +37,7 @@ interface AzkarCardProps {
 export function AzkarCard({ dhikr, counter }: AzkarCardProps) {
   const { isFavorite, toggleFavorite } = useFavorites();
   const favorite = isFavorite(dhikr.id);
+  const { style: counterStyle } = useCounterPreference();
 
   const CategoryIcon = dhikr.category === "quran" ? BookOpenText : MessageCircle;
   const verses = dhikr.text.split("*").map((verse) => verse.trim());
@@ -49,7 +52,7 @@ export function AzkarCard({ dhikr, counter }: AzkarCardProps) {
         aria-label={`${CATEGORY_LABEL[dhikr.category]}: ${dhikr.text.slice(0, 40)}...`}
         className="contents"
       >
-        <CardHeader className="flex-row items-center justify-between gap-2">
+        <CardHeader className="flex items-center justify-between gap-2">
           <Badge variant="secondary" className="gap-1">
             <CategoryIcon aria-hidden="true" />
             {CATEGORY_LABEL[dhikr.category]}
@@ -80,7 +83,8 @@ export function AzkarCard({ dhikr, counter }: AzkarCardProps) {
         </CardHeader>
 
         <CardContent className="flex flex-col gap-3">
-          <p className="text-lg leading-loose text-foreground sm:text-xl">
+          <p className="text-center text-lg leading-loose text-foreground sm:text-xl">
+            <span aria-hidden="true">﴿ </span>
             {verses.map((verse, index) => (
               <span key={index}>
                 {verse}
@@ -91,6 +95,7 @@ export function AzkarCard({ dhikr, counter }: AzkarCardProps) {
                 ) : null}
               </span>
             ))}
+            <span aria-hidden="true"> ﴾</span>
           </p>
 
           {dhikr.hadith ? (
@@ -100,12 +105,14 @@ export function AzkarCard({ dhikr, counter }: AzkarCardProps) {
           ) : null}
         </CardContent>
 
-        <CardFooter className="justify-end">
+        <CardFooter className={cn(counterStyle === "balanced" ? "justify-center" : "justify-end")}>
           {counter ? (
             <AzkarCounter
               current={counter.current}
               target={dhikr.count}
               onIncrement={counter.onIncrement}
+              onReset={counter.onReset}
+              style={counterStyle}
               label={dhikr.text.slice(0, 40)}
             />
           ) : (

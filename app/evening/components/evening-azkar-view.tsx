@@ -13,7 +13,7 @@ interface EveningAzkarViewProps {
  *  threads counter state down into the (purely presentational, shared)
  *  AzkarProgress/AzkarCard components. */
 export function EveningAzkarView({ items }: EveningAzkarViewProps) {
-  const { getCount, increment, completedCount, totalCount } =
+  const { getCount, increment, reset, completedCount, totalCount } =
     useEveningProgress(items);
 
   return (
@@ -27,6 +27,7 @@ export function EveningAzkarView({ items }: EveningAzkarViewProps) {
             counter={{
               current: getCount(dhikr.id),
               onIncrement: () => increment(dhikr.id, dhikr.count),
+              onReset: () => reset(dhikr.id),
             }}
           />
         ))}

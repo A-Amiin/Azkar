@@ -13,6 +13,8 @@ interface UseAzkarProgressResult {
   /** Increments the given dhikr's count, clamped at `target` (its required
    *  repetition count). */
   increment: (id: string, target: number) => void;
+  /** Resets one dhikr without affecting the rest of today's progress. */
+  reset: (id: string) => void;
   /** Number of dhikr whose count has reached its own required repetitions —
    *  not merely "started". */
   completedCount: number;
@@ -69,6 +71,22 @@ export function useAzkarProgress(
     [setStored, today]
   );
 
+  const reset = useCallback(
+    (id: string) => {
+      setStored((previous) => {
+        const base = previous.date === today ? previous.counts : {};
+        if (!(id in base)) return { version: 1, date: today, counts: base };
+
+        return {
+          version: 1,
+          date: today,
+          counts: { ...base, [id]: 0 },
+        };
+      });
+    },
+    [setStored, today]
+  );
+
   const completedCount = useMemo(
     () =>
       items.filter((item) => (counts[item.id] ?? 0) >= item.count).length,
@@ -80,6 +98,7 @@ export function useAzkarProgress(
   return {
     getCount,
     increment,
+    reset,
     completedCount,
     totalCount,
     isComplete: totalCount > 0 && completedCount >= totalCount,

@@ -1,4 +1,4 @@
-import { Heart, House, Sunrise, Sunset, type LucideIcon } from "lucide-react";
+import { Heart, House, Settings2, Sunrise, Sunset, type LucideIcon } from "lucide-react";
 
 export const SITE_NAME = "أذكار الصباح والمساء";
 
@@ -13,4 +13,5 @@ export const NAV_ITEMS: NavItem[] = [
   { href: "/morning", label: "أذكار الصباح", icon: Sunrise },
   { href: "/evening", label: "أذكار المساء", icon: Sunset },
   { href: "/favorites", label: "المفضلة", icon: Heart },
+  { href: "/customization", label: "التخصيص", icon: Settings2 },
 ];

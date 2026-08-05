@@ -10,6 +10,7 @@ export const STORAGE_KEYS = {
   favorites: "azkar:favorites",
   morningProgress: "azkar:progress:morning",
   eveningProgress: "azkar:progress:evening",
+  counterPreference: "azkar:counter-preference",
   uiState: "azkar:ui-state",
 } as const;
 
@@ -32,10 +33,18 @@ export interface UiStateSchemaV1 {
   installTipDismissed: boolean;
 }
 
+export type CounterStyle = "compact" | "balanced";
+
+export interface CounterPreferenceSchemaV1 {
+  version: 1;
+  style: CounterStyle;
+}
+
 export interface StorageSchemaMap {
   [STORAGE_KEYS.favorites]: FavoritesSchemaV1;
   [STORAGE_KEYS.morningProgress]: ProgressSchemaV1;
   [STORAGE_KEYS.eveningProgress]: ProgressSchemaV1;
+  [STORAGE_KEYS.counterPreference]: CounterPreferenceSchemaV1;
   [STORAGE_KEYS.uiState]: UiStateSchemaV1;
 }
 

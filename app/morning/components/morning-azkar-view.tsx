@@ -13,7 +13,7 @@ interface MorningAzkarViewProps {
  *  threads counter state down into the (purely presentational, shared)
  *  AzkarProgress/AzkarCard components. */
 export function MorningAzkarView({ items }: MorningAzkarViewProps) {
-  const { getCount, increment, completedCount, totalCount } =
+  const { getCount, increment, reset, completedCount, totalCount } =
     useMorningProgress(items);
 
   return (
@@ -27,6 +27,7 @@ export function MorningAzkarView({ items }: MorningAzkarViewProps) {
             counter={{
               current: getCount(dhikr.id),
               onIncrement: () => increment(dhikr.id, dhikr.count),
+              onReset: () => reset(dhikr.id),
             }}
           />
         ))}
