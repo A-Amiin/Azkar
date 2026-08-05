@@ -7,7 +7,7 @@ import { buildMetadata } from "@/lib/metadata";
 export const metadata: Metadata = buildMetadata({
   title: "أذكار المساء",
   description: "اقرأ أذكار المساء كاملة مع عداد تكرار تلقائي ومتابعة للتقدم اليومي",
-  path: "/evening",
+  path: "/evening/",
 });
 
 export default function EveningPage() {

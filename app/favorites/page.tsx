@@ -6,7 +6,7 @@ import { buildMetadata } from "@/lib/metadata";
 export const metadata: Metadata = buildMetadata({
   title: "الأذكار المفضلة",
   description: "أذكارك المحفوظة والمفضلة لديك في مكان واحد لسهولة الرجوع إليها",
-  path: "/favorites",
+  path: "/favorites/",
 });
 
 export default function FavoritesPage() {

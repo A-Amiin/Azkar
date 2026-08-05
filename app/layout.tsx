@@ -28,7 +28,8 @@ export const metadata: Metadata = {
     default: siteConfig.name,
     template: `%s | ${siteConfig.name}`,
   },
-  description: "تطبيق عربي لقراءة ومتابعة أذكار الصباح والمساء",
+  description:
+    "تطبيق عربي بسيط لقراءة ومتابعة أذكار الصباح والمساء مع عداد تكرار وحفظ للمفضلة، يعمل بدون إنترنت",
 };
 
 export const viewport: Viewport = {
