@@ -6,37 +6,35 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { AzkarCounter } from "@/components/shared/azkar-counter";
-import { useAzkarProgress } from "@/hooks/use-azkar-progress";
 import { useFavorites } from "@/hooks/use-favorites";
 import { cn } from "@/lib/utils";
-import type { AzkarPeriod, Dhikr } from "@/types/azkar";
+import type { Dhikr } from "@/types/azkar";
 
 const CATEGORY_LABEL: Record<Dhikr["category"], string> = {
   quran: "قرآن",
   sunnah: "سنة",
 };
 
-interface AzkarCardProps {
-  dhikr: Dhikr;
-  /** When set, renders a tappable repetition counter (morning/evening
-   *  reading views). When omitted (e.g. the favorites list), the required
-   *  repetition count is shown as a static badge instead — favorites is a
-   *  reference list, not a counting surface. */
-  period?: AzkarPeriod;
+interface AzkarCardCounter {
+  current: number;
+  onIncrement: () => void;
 }
 
-export function AzkarCard({ dhikr, period }: AzkarCardProps) {
+interface AzkarCardProps {
+  dhikr: Dhikr;
+  /** Present on /morning and /evening (owned by that route's progress
+   *  hook and threaded down as a prop) to show a tappable counter. Absent
+   *  on /favorites, where the required repetition count is shown as a
+   *  static badge instead — favorites is a reference list, not a counting
+   *  surface. Keeping this a plain prop (rather than the card calling a
+   *  progress hook itself) is what makes this component reusable across
+   *  all three routes without knowing which period it's in. */
+  counter?: AzkarCardCounter;
+}
+
+export function AzkarCard({ dhikr, counter }: AzkarCardProps) {
   const { isFavorite, toggleFavorite } = useFavorites();
   const favorite = isFavorite(dhikr.id);
-
-  // Only `getCount`/`increment` are used here — the single-item `items`
-  // array means this call's own completedCount/totalCount are unused, but
-  // it shares the same underlying storage key (and therefore live sync)
-  // with the period's <AzkarProgress> aggregate bar.
-  const { getCount, increment } = useAzkarProgress(
-    period ?? "morning",
-    period ? [{ id: dhikr.id, count: dhikr.count }] : []
-  );
 
   const CategoryIcon = dhikr.category === "quran" ? BookOpenText : MessageCircle;
   const verses = dhikr.text.split("*").map((verse) => verse.trim());
@@ -103,11 +101,11 @@ export function AzkarCard({ dhikr, period }: AzkarCardProps) {
         </CardContent>
 
         <CardFooter className="justify-end">
-          {period ? (
+          {counter ? (
             <AzkarCounter
-              current={getCount(dhikr.id)}
+              current={counter.current}
               target={dhikr.count}
-              onIncrement={() => increment(dhikr.id, dhikr.count)}
+              onIncrement={counter.onIncrement}
               label={dhikr.text.slice(0, 40)}
             />
           ) : (

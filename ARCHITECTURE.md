@@ -98,6 +98,13 @@ types/          azkar.ts
 public/         sw.js
 ```
 
-مجلدات لم تُنشأ عمدًا (لتفادي مجلدات فارغة): `app/morning/components/`،
-`app/evening/components/`، `app/favorites/hooks/`، `public/icons/`،
-`public/screenshots/`.
+مجلدات لم تُنشأ عمدًا (لتفادي مجلدات فارغة): `app/favorites/hooks/`
+(صفحة المفضلة تستخدم `hooks/use-favorites.ts` المشترك مباشرة، ولا تحتاج
+خطّاف تقدّم خاصًا بها)، `public/icons/`، `public/screenshots/`.
+
+ملاحظة تصحيح: تحتوي `app/morning/components/` و`app/evening/components/`
+على مكوّن عرض واحد لكل مسار (`morning-azkar-view.tsx` / 
+`evening-azkar-view.tsx`) — وهذا مقصود: مكوّنات `AzkarCard`/`AzkarProgress`
+المشتركة أصبحت عرضية بحتة (تستقبل حالة العدّاد كخاصية prop)، وخطّاف التقدّم
+الخاص بكل فترة (`use-morning-progress` / `use-evening-progress`) يحتاج
+حدًّا عميلًا (client boundary) يستدعيه فعليًا — وإلا كان سيبقى كودًا ميتًا.

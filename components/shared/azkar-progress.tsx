@@ -1,21 +1,18 @@
 "use client";
 
-import { useAzkarProgress } from "@/hooks/use-azkar-progress";
 import { Progress } from "@/components/ui/progress";
-import type { AzkarPeriod, Dhikr } from "@/types/azkar";
 
 interface AzkarProgressProps {
-  period: AzkarPeriod;
-  items: Pick<Dhikr, "id" | "count">[];
+  completedCount: number;
+  totalCount: number;
 }
 
-/** Reads the same per-day, per-period storage key as every AzkarCounter on
- *  the page, so it live-updates in sync as the user taps through the list.
+/** Purely presentational — the period's progress hook (owned by the route,
+ *  e.g. `app/morning/hooks/use-morning-progress.ts`) computes these counts
+ *  so this component stays reusable without knowing which period it's in.
  *  `Progress` (components/ui/progress.tsx) renders its own track/indicator
  *  after its children, so only the label row is passed as children here. */
-export function AzkarProgress({ period, items }: AzkarProgressProps) {
-  const { completedCount, totalCount } = useAzkarProgress(period, items);
-
+export function AzkarProgress({ completedCount, totalCount }: AzkarProgressProps) {
   return (
     <Progress
       value={completedCount}
