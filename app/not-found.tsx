@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Compass } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button-variants";
 import { PageHeading } from "@/components/shared/page-heading";
 
 export default function NotFound() {
@@ -11,9 +11,9 @@ export default function NotFound() {
         title="الصفحة غير موجودة"
         description="الرابط الذي وصلت إليه غير صحيح أو لم يعد متاحًا."
       />
-      <Button nativeButton={false} render={<Link href="/" />}>
+      <Link href="/" className={buttonVariants()}>
         العودة إلى الرئيسية
-      </Button>
+      </Link>
     </section>
   );
 }

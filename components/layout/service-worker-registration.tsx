@@ -14,6 +14,38 @@ export function ServiceWorkerRegistration() {
   useEffect(() => {
     if (!("serviceWorker" in navigator)) return;
 
+    // Never keep a production PWA worker active against the development
+    // server. Turbopack can reuse chunk URLs while their module graph changes.
+    if (process.env.NODE_ENV === "development") {
+      void Promise.all([
+        navigator.serviceWorker
+          .getRegistrations()
+          .then((registrations) =>
+            Promise.all(registrations.map((registration) => registration.unregister()))
+          ),
+        "caches" in window
+          ? caches
+              .keys()
+              .then((keys) =>
+                Promise.all(
+                  keys
+                    .filter((key) => key.startsWith("azkar-"))
+                    .map((key) => caches.delete(key))
+                )
+              )
+          : Promise.resolve([]),
+      ]).then(() => {
+        if (!navigator.serviceWorker.controller) return;
+
+        const reloadKey = "azkar-dev-sw-cleanup";
+        if (sessionStorage.getItem(reloadKey)) return;
+        sessionStorage.setItem(reloadKey, "done");
+        window.location.reload();
+      });
+
+      return;
+    }
+
     function promptForUpdate(worker: ServiceWorker) {
       toast("نسخة جديدة من التطبيق متاحة", {
         action: {
@@ -26,7 +58,9 @@ export function ServiceWorkerRegistration() {
 
     let cancelled = false;
 
-    navigator.serviceWorker.register("/sw.js").then((registration) => {
+    navigator.serviceWorker
+      .register("/sw.js", { updateViaCache: "none" })
+      .then((registration) => {
       if (cancelled) return;
 
       if (registration.waiting && navigator.serviceWorker.controller) {
@@ -46,7 +80,10 @@ export function ServiceWorkerRegistration() {
           }
         });
       });
-    });
+      })
+      .catch(() => {
+        // The application remains usable if PWA registration is unavailable.
+      });
 
     const onControllerChange = () => {
       if (hasReloaded.current) return;

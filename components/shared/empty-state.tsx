@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { LucideIcon } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button-variants";
 import {
   Empty,
   EmptyContent,
@@ -37,9 +37,9 @@ export function EmptyState({
         <EmptyDescription>{description}</EmptyDescription>
       </EmptyHeader>
       <EmptyContent>
-        <Button nativeButton={false} render={<Link href={actionHref} />}>
+        <Link href={actionHref} className={buttonVariants()}>
           {actionLabel}
-        </Button>
+        </Link>
       </EmptyContent>
     </Empty>
   );

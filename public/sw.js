@@ -20,7 +20,7 @@
 // the "update available" toast), so a new version never silently swaps
 // assets out from under someone mid-session.
 
-const CACHE_VERSION = "v1";
+const CACHE_VERSION = "v2";
 const SHELL_CACHE = `azkar-shell-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `azkar-runtime-${CACHE_VERSION}`;
 const OFFLINE_URL = "/offline/";
@@ -57,10 +57,11 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("fetch", (event) => {
   const { request } = event;
+  const url = new URL(request.url);
 
   // Only same-origin GET requests are cacheable here — everything else
   // (POST, cross-origin) passes straight through to the network.
-  if (request.method !== "GET" || new URL(request.url).origin !== self.location.origin) {
+  if (request.method !== "GET" || url.origin !== self.location.origin) {
     return;
   }
 
@@ -69,8 +70,30 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
+  // Next may reuse development chunk URLs after their module graph changes.
+  // Fetch these assets from the network first so two builds are never mixed.
+  if (url.pathname.startsWith("/_next/")) {
+    event.respondWith(handleNextAsset(request));
+    return;
+  }
+
   event.respondWith(handleAsset(request));
 });
+
+async function handleNextAsset(request) {
+  const cache = await caches.open(RUNTIME_CACHE);
+
+  try {
+    const response = await fetch(request, { cache: "no-store" });
+    if (response.ok) {
+      cache.put(request, response.clone());
+    }
+    return response;
+  } catch {
+    const cached = await cache.match(request);
+    return cached ?? Response.error();
+  }
+}
 
 async function handleNavigation(request) {
   try {
