@@ -25,7 +25,7 @@ export function BrandMark({ size = 32, className }: BrandMarkProps) {
         </linearGradient>
         <mask id="brand-mark-crescent">
           <rect width="32" height="32" fill="white" />
-          <circle cx="20" cy="11" r="9" fill="black" />
+          <circle cx="20" cy="10" r="14" fill="black" />
         </mask>
       </defs>
       <circle
