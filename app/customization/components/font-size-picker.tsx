@@ -11,9 +11,9 @@ const FONT_OPTIONS: Array<{
   label: string;
   pixels: number;
 }> = [
-  { value: "small", label: "صغير", pixels: 14 },
-  { value: "medium", label: "متوسط", pixels: 16 },
-  { value: "large", label: "كبير", pixels: 18 },
+  { value: "small", label: "صغير", pixels: 16 },
+  { value: "medium", label: "متوسط", pixels: 18 },
+  { value: "large", label: "كبير", pixels: 20 },
 ];
 
 export function FontSizePicker() {

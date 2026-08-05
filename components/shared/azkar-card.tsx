@@ -1,6 +1,7 @@
 "use client";
 
-import { BookOpenText, Heart, MessageCircle } from "lucide-react";
+import { BookOpenText, Heart } from "lucide-react";
+import { UssunnahIcon } from "@/components/icons/ussunnah-icon";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
@@ -39,7 +40,6 @@ export function AzkarCard({ dhikr, counter }: AzkarCardProps) {
   const favorite = isFavorite(dhikr.id);
   const { style: counterStyle } = useCounterPreference();
 
-  const CategoryIcon = dhikr.category === "quran" ? BookOpenText : MessageCircle;
   const verses = dhikr.text.split("*").map((verse) => verse.trim());
 
   return (
@@ -54,7 +54,11 @@ export function AzkarCard({ dhikr, counter }: AzkarCardProps) {
       >
         <CardHeader className="flex items-center justify-between gap-2">
           <Badge variant="secondary" className="gap-1">
-            <CategoryIcon aria-hidden="true" />
+            {dhikr.category === "quran" ? (
+              <BookOpenText aria-hidden="true" />
+            ) : (
+              <UssunnahIcon aria-hidden="true" className="size-5" />
+            )}
             {CATEGORY_LABEL[dhikr.category]}
           </Badge>
 
