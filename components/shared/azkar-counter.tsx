@@ -91,32 +91,40 @@ export function AzkarCounter({
         <RotateCcw aria-hidden="true" />
       </Button>
 
-      <button
-        type="button"
-        onClick={onIncrement}
-        disabled={isComplete}
-        aria-label={`${label}، العدد ${current} من ${target}${isComplete ? "، اكتمل" : ""}`}
-        className={cn(
-          "relative flex size-16 shrink-0 items-center justify-center rounded-full",
-          "transition-transform duration-150 active:scale-95",
-          "focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
-          "disabled:cursor-default"
-        )}
-        style={{
-          background: `conic-gradient(var(--primary) ${percentage}%, var(--secondary) ${percentage}% 100%)`,
-        }}
-      >
-        <span className="absolute inset-[3px] flex items-center justify-center rounded-full bg-card">
-          {isComplete ? (
-            <Check aria-hidden="true" className="size-6 text-primary" />
-          ) : (
-            <span className="flex flex-col items-center leading-none">
-              <span className="text-lg font-bold tabular-nums text-foreground">{current}</span>
-              <span className="text-[10px] text-muted-foreground">من {target}</span>
-            </span>
+      <div className="flex flex-col items-center gap-1.5">
+        <button
+          type="button"
+          onClick={onIncrement}
+          disabled={isComplete}
+          aria-label={`${label}، العدد ${current} من ${target}${isComplete ? "، اكتمل" : ""}`}
+          className={cn(
+            "relative flex size-16 shrink-0 items-center justify-center rounded-full",
+            "transition-transform duration-150 active:scale-95",
+            "focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+            "disabled:cursor-default"
           )}
+          style={{
+            background: `conic-gradient(var(--primary) ${percentage}%, var(--secondary) ${percentage}% 100%)`,
+          }}
+        >
+          <span className="absolute inset-[3px] flex items-center justify-center rounded-full bg-card">
+            {isComplete ? (
+              <Check aria-hidden="true" className="size-6 text-primary" />
+            ) : (
+              <span className="text-xl font-bold tabular-nums text-foreground">
+                {current}
+              </span>
+            )}
+          </span>
+        </button>
+
+        <span
+          className="text-base font-semibold tabular-nums text-foreground"
+          aria-hidden="true"
+        >
+          من {target}
         </span>
-      </button>
+      </div>
 
       {milestoneAnnouncement}
     </div>
