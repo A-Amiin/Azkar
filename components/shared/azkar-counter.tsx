@@ -4,6 +4,7 @@ import { Check, Plus, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { CounterStyle } from "@/lib/storage";
+import { useFontPreference } from "@/hooks/use-font-preference";
 
 interface AzkarCounterProps {
   current: number;
@@ -29,6 +30,7 @@ export function AzkarCounter({
   label,
 }: AzkarCounterProps) {
   const isComplete = current >= target;
+  const { size: fontSize } = useFontPreference();
   const percentage = target > 0 ? Math.min(100, Math.round((current / target) * 100)) : 0;
 
   const milestoneAnnouncement = (
@@ -91,7 +93,12 @@ export function AzkarCounter({
         <RotateCcw aria-hidden="true" />
       </Button>
 
-      <div className="flex flex-col items-center gap-1.5">
+      <div
+        className={cn(
+          "flex items-center gap-1.5",
+          fontSize === "large" ? "flex-row" : "flex-col"
+        )}
+      >
         <button
           type="button"
           onClick={onIncrement}

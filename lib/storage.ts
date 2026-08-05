@@ -11,6 +11,7 @@ export const STORAGE_KEYS = {
   morningProgress: "azkar:progress:morning",
   eveningProgress: "azkar:progress:evening",
   counterPreference: "azkar:counter-preference",
+  fontPreference: "azkar:font-preference",
   uiState: "azkar:ui-state",
 } as const;
 
@@ -40,11 +41,19 @@ export interface CounterPreferenceSchemaV1 {
   style: CounterStyle;
 }
 
+export type FontSizePreference = "small" | "medium" | "large";
+
+export interface FontPreferenceSchemaV1 {
+  version: 1;
+  size: FontSizePreference;
+}
+
 export interface StorageSchemaMap {
   [STORAGE_KEYS.favorites]: FavoritesSchemaV1;
   [STORAGE_KEYS.morningProgress]: ProgressSchemaV1;
   [STORAGE_KEYS.eveningProgress]: ProgressSchemaV1;
   [STORAGE_KEYS.counterPreference]: CounterPreferenceSchemaV1;
+  [STORAGE_KEYS.fontPreference]: FontPreferenceSchemaV1;
   [STORAGE_KEYS.uiState]: UiStateSchemaV1;
 }
 

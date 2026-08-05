@@ -5,6 +5,7 @@ import { Tajawal } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { AppFooter } from "@/components/layout/app-footer";
 import { AppHeader } from "@/components/layout/app-header";
+import { FontPreferenceSync } from "@/components/layout/font-preference-sync";
 import { ServiceWorkerRegistration } from "@/components/layout/service-worker-registration";
 import { SplashScreen } from "@/components/layout/splash-screen";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -88,6 +89,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
         </TooltipProvider>
 
         <Toaster position="top-center" />
+        <FontPreferenceSync />
         <ServiceWorkerRegistration />
       </body>
     </html>
