@@ -7,7 +7,6 @@ import { AppFooter } from "@/components/layout/app-footer";
 import { AppHeader } from "@/components/layout/app-header";
 import { ServiceWorkerRegistration } from "@/components/layout/service-worker-registration";
 import { SplashScreen } from "@/components/layout/splash-screen";
-import { InstallPwaPrompt } from "@/components/shared/install-pwa-prompt";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
 import { siteConfig } from "@/lib/metadata";
@@ -66,7 +65,7 @@ type RootLayoutProps = Readonly<{
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="ar" dir="rtl" className={cn("font-sans", tajawal.variable)}>
-      <body>
+      <body className="flex min-h-dvh flex-col">
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
@@ -82,8 +81,9 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <TooltipProvider>
           <SplashScreen />
           <AppHeader />
-          <InstallPwaPrompt />
-          <main id="main-content">{children}</main>
+          <main id="main-content" className="flex flex-1 flex-col">
+            {children}
+          </main>
           <AppFooter />
         </TooltipProvider>
 

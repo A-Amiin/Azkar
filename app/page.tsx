@@ -26,7 +26,7 @@ const HOME_CARDS = [
 
 export default function HomePage() {
   return (
-    <section className="mx-auto flex max-w-3xl flex-col gap-8 px-4 py-8">
+    <section className="mx-auto flex w-full max-w-3xl flex-1 flex-col justify-center gap-8 px-4 py-10 sm:py-12">
       <PageHeading
         title="أذكار الصباح والمساء"
         description="اقرأ، عُدَّ، واحفظ أذكارك اليومية — بدون إنترنت وبدون تعقيد."
