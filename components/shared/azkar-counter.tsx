@@ -1,7 +1,8 @@
 "use client";
 
-import { Check, Plus, RotateCcw } from "lucide-react";
+import { Check, CheckCheck, Plus, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import type { CounterStyle } from "@/lib/storage";
 import { useFontPreference } from "@/hooks/use-font-preference";
@@ -10,6 +11,7 @@ interface AzkarCounterProps {
   current: number;
   target: number;
   onIncrement: () => void;
+  onFill: () => void;
   onReset: () => void;
   style?: CounterStyle;
   /** Accessible label describing which dhikr this counts, e.g. the dhikr's
@@ -25,6 +27,7 @@ export function AzkarCounter({
   current,
   target,
   onIncrement,
+  onFill,
   onReset,
   style = "compact",
   label,
@@ -39,20 +42,29 @@ export function AzkarCounter({
     </span>
   );
 
+  const fillButton = target > 1 ? (
+    <Tooltip>
+      <TooltipTrigger
+        render={
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            onClick={onFill}
+            disabled={isComplete}
+            aria-label="إكمال العدد دفعة واحدة"
+          />
+        }
+      >
+        <CheckCheck aria-hidden="true" />
+      </TooltipTrigger>
+      <TooltipContent>إكمال العدد دفعة واحدة</TooltipContent>
+    </Tooltip>
+  ) : null;
+
   if (style === "balanced") {
     return (
       <div className="flex w-full items-center justify-center gap-3">
-        <Button
-          type="button"
-          variant="outline"
-          size="icon"
-          onClick={onReset}
-          disabled={current === 0}
-          aria-label={`إعادة عداد ${label} إلى صفر`}
-        >
-          <RotateCcw aria-hidden="true" />
-        </Button>
-
         <output
           className="inline-flex min-h-11 min-w-24 items-center justify-center rounded-md bg-secondary px-4 text-base font-medium tabular-nums text-secondary-foreground"
           aria-label={`العدد ${current} من ${target}`}
@@ -70,6 +82,19 @@ export function AzkarCounter({
           <Plus aria-hidden="true" />
         </Button>
 
+        {fillButton}
+
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          onClick={onReset}
+          disabled={current === 0}
+          aria-label={`إعادة عداد ${label} إلى صفر`}
+        >
+          <RotateCcw aria-hidden="true" />
+        </Button>
+
         {milestoneAnnouncement}
       </div>
     );
@@ -82,17 +107,6 @@ export function AzkarCounter({
   // minimum for comfortable one-handed use.
   return (
     <div className="flex w-full items-center justify-center gap-4">
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon"
-        onClick={onReset}
-        disabled={current === 0}
-        aria-label={`إعادة عداد ${label} إلى صفر`}
-      >
-        <RotateCcw aria-hidden="true" />
-      </Button>
-
       <div
         className={cn(
           "flex items-center gap-1.5",
@@ -132,6 +146,19 @@ export function AzkarCounter({
           من {target}
         </span>
       </div>
+
+      {fillButton}
+
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        onClick={onReset}
+        disabled={current === 0}
+        aria-label={`إعادة عداد ${label} إلى صفر`}
+      >
+        <RotateCcw aria-hidden="true" />
+      </Button>
 
       {milestoneAnnouncement}
     </div>

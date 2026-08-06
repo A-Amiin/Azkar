@@ -13,11 +13,15 @@ interface UseAzkarProgressResult {
   /** Increments the given dhikr's count, clamped at `target` (its required
    *  repetition count). */
   increment: (id: string, target: number) => void;
+  /** Marks one dhikr complete in a single write. */
+  complete: (id: string, target: number) => void;
   /** Resets one dhikr without affecting the rest of today's progress. */
   reset: (id: string) => void;
   /** Number of dhikr whose count has reached its own required repetitions —
    *  not merely "started". */
   completedCount: number;
+  /** Sum of each dhikr's completion fraction, used for smooth progress. */
+  fractionalCompletedCount: number;
   totalCount: number;
   isComplete: boolean;
 }
@@ -87,6 +91,24 @@ export function useAzkarProgress(
     [setStored, today]
   );
 
+  const complete = useCallback(
+    (id: string, target: number) => {
+      setStored((previous) => {
+        const base = previous.date === today ? previous.counts : {};
+        if ((base[id] ?? 0) >= target) {
+          return { version: 1, date: today, counts: base };
+        }
+
+        return {
+          version: 1,
+          date: today,
+          counts: { ...base, [id]: target },
+        };
+      });
+    },
+    [setStored, today]
+  );
+
   const completedCount = useMemo(
     () =>
       items.filter((item) => (counts[item.id] ?? 0) >= item.count).length,
@@ -95,11 +117,22 @@ export function useAzkarProgress(
 
   const totalCount = items.length;
 
+  const fractionalCompletedCount = useMemo(
+    () =>
+      items.reduce((total, item) => {
+        if (item.count <= 0) return total + 1;
+        return total + Math.min(1, (counts[item.id] ?? 0) / item.count);
+      }, 0),
+    [items, counts]
+  );
+
   return {
     getCount,
     increment,
+    complete,
     reset,
     completedCount,
+    fractionalCompletedCount,
     totalCount,
     isComplete: totalCount > 0 && completedCount >= totalCount,
   };

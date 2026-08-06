@@ -85,6 +85,7 @@ export function CounterStylePicker() {
                   onIncrement={() =>
                     setPreview(option.value, Math.min(previewCounts[option.value] + 1, 10))
                   }
+                  onFill={() => setPreview(option.value, 10)}
                   onReset={() => setPreview(option.value, 0)}
                 />
               </div>

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { AutoAdvanceToggle } from "@/app/customization/components/auto-advance-toggle";
 import { CounterStylePicker } from "@/app/customization/components/counter-style-picker";
 import { FontSizePicker } from "@/app/customization/components/font-size-picker";
 import { ThemePicker } from "@/app/customization/components/theme-picker";
@@ -43,6 +44,20 @@ export default function CustomizationPage() {
           </p>
         </div>
         <ThemePicker />
+      </section>
+
+      <Separator />
+
+      <section className="space-y-4" aria-labelledby="auto-advance-heading">
+        <div className="space-y-1">
+          <h2 id="auto-advance-heading" className="font-heading text-xl font-bold">
+            الانتقال التلقائي
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            انتقل إلى الذكر التالي تلقائيًا بعد إكمال العدد المطلوب.
+          </p>
+        </div>
+        <AutoAdvanceToggle />
       </section>
 
       <Separator />

@@ -4,6 +4,7 @@ import { Progress } from "@/components/ui/progress";
 
 interface AzkarProgressProps {
   completedCount: number;
+  fractionalCompletedCount: number;
   totalCount: number;
 }
 
@@ -12,10 +13,14 @@ interface AzkarProgressProps {
  *  so this component stays reusable without knowing which period it's in.
  *  `Progress` (components/ui/progress.tsx) renders its own track/indicator
  *  after its children, so only the label row is passed as children here. */
-export function AzkarProgress({ completedCount, totalCount }: AzkarProgressProps) {
+export function AzkarProgress({
+  completedCount,
+  fractionalCompletedCount,
+  totalCount,
+}: AzkarProgressProps) {
   return (
     <Progress
-      value={completedCount}
+      value={fractionalCompletedCount}
       max={Math.max(totalCount, 1)}
       getAriaValueText={() => `${completedCount} من ${totalCount}`}
       className="flex-col items-stretch gap-2"

@@ -20,6 +20,7 @@ const CATEGORY_LABEL: Record<Dhikr["category"], string> = {
 interface AzkarCardCounter {
   current: number;
   onIncrement: () => void;
+  onFill: () => void;
   onReset: () => void;
 }
 
@@ -43,7 +44,7 @@ export function AzkarCard({ dhikr, counter }: AzkarCardProps) {
   const verses = dhikr.text.split("*").map((verse) => verse.trim());
 
   return (
-    <Card className="scroll-mt-20">
+    <Card className="h-[520px] scroll-mt-20 sm:h-[440px]">
       {/* `contents` removes this element from the box model so CardHeader/
           CardContent/CardFooter remain direct flex participants of Card's
           own flex/gap layout, while keeping <article> in the DOM/a11y tree
@@ -86,7 +87,7 @@ export function AzkarCard({ dhikr, counter }: AzkarCardProps) {
           </Tooltip>
         </CardHeader>
 
-        <CardContent className="flex flex-col gap-3">
+        <CardContent className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto">
           <p className="text-center text-lg leading-loose text-foreground sm:text-xl">
             <span aria-hidden="true">﴿ </span>
             {verses.map((verse, index) => (
@@ -115,6 +116,7 @@ export function AzkarCard({ dhikr, counter }: AzkarCardProps) {
               current={counter.current}
               target={dhikr.count}
               onIncrement={counter.onIncrement}
+              onFill={counter.onFill}
               onReset={counter.onReset}
               style={counterStyle}
               label={dhikr.text.slice(0, 40)}

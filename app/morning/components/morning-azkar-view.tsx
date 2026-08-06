@@ -13,17 +13,32 @@ interface MorningAzkarViewProps {
  *  threads counter state down into the (purely presentational, shared)
  *  AzkarProgress/AzkarCard components. */
 export function MorningAzkarView({ items }: MorningAzkarViewProps) {
-  const { getCount, increment, reset, completedCount, totalCount } =
+  const {
+    getCount,
+    increment,
+    complete,
+    reset,
+    completedCount,
+    fractionalCompletedCount,
+    totalCount,
+  } =
     useMorningProgress(items);
 
   return (
     <div className="flex flex-col gap-6">
-      <AzkarProgress completedCount={completedCount} totalCount={totalCount} />
+      <AzkarProgress
+        completedCount={completedCount}
+        fractionalCompletedCount={fractionalCompletedCount}
+        totalCount={totalCount}
+      />
       <AzkarSequence
         items={items}
         getCount={getCount}
         increment={increment}
+        complete={complete}
         reset={reset}
+        completedCount={completedCount}
+        totalCount={totalCount}
       />
     </div>
   );

@@ -11,6 +11,7 @@ export const STORAGE_KEYS = {
   morningProgress: "azkar:progress:morning",
   eveningProgress: "azkar:progress:evening",
   counterPreference: "azkar:counter-preference",
+  autoAdvance: "azkar:auto-advance-preference",
   fontPreference: "azkar:font-preference",
   themePreference: "azkar:theme-preference",
   uiState: "azkar:ui-state",
@@ -42,6 +43,11 @@ export interface CounterPreferenceSchemaV1 {
   style: CounterStyle;
 }
 
+export interface AutoAdvancePreferenceSchemaV1 {
+  version: 1;
+  enabled: boolean;
+}
+
 export type FontSizePreference = "small" | "medium" | "large";
 
 export interface FontPreferenceSchemaV1 {
@@ -61,6 +67,7 @@ export interface StorageSchemaMap {
   [STORAGE_KEYS.morningProgress]: ProgressSchemaV1;
   [STORAGE_KEYS.eveningProgress]: ProgressSchemaV1;
   [STORAGE_KEYS.counterPreference]: CounterPreferenceSchemaV1;
+  [STORAGE_KEYS.autoAdvance]: AutoAdvancePreferenceSchemaV1;
   [STORAGE_KEYS.fontPreference]: FontPreferenceSchemaV1;
   [STORAGE_KEYS.themePreference]: ThemePreferenceSchemaV1;
   [STORAGE_KEYS.uiState]: UiStateSchemaV1;
