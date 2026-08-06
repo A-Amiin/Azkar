@@ -18,18 +18,31 @@ export function AzkarProgress({
   fractionalCompletedCount,
   totalCount,
 }: AzkarProgressProps) {
+  const progressPercentage =
+    totalCount > 0
+      ? Math.min(100, (fractionalCompletedCount / totalCount) * 100)
+      : 0;
+  const formattedPercentage = progressPercentage.toFixed(1);
+
   return (
     <Progress
-      value={fractionalCompletedCount}
-      max={Math.max(totalCount, 1)}
-      getAriaValueText={() => `${completedCount} من ${totalCount}`}
+      value={progressPercentage}
+      max={100}
+      getAriaValueText={() =>
+        `${formattedPercentage} بالمئة، أُكمل ${completedCount} من ${totalCount} ذكر`
+      }
       className="flex-col items-stretch gap-2"
     >
       <div className="flex items-center justify-between text-sm">
         <span className="font-medium text-foreground">التقدّم اليوم</span>
-        <span className="tabular-nums text-muted-foreground">
-          {completedCount} / {totalCount}
-        </span>
+        <div className="flex items-center gap-2 text-muted-foreground">
+          <span dir="ltr" className="font-medium tabular-nums text-foreground">
+            {formattedPercentage}%
+          </span>
+          <span dir="ltr" className="tabular-nums">
+            {completedCount} / {totalCount} ذكر
+          </span>
+        </div>
       </div>
     </Progress>
   );
