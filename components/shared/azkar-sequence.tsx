@@ -1,10 +1,19 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ArrowLeft, ArrowRight, CircleCheck, Info } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { ArrowLeft, ArrowRight, House, Info, PartyPopper } from "lucide-react";
 import { AzkarCard } from "@/components/shared/azkar-card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { useAutoAdvancePreference } from "@/hooks/use-auto-advance-preference";
 import type { Dhikr } from "@/types/azkar";
 
@@ -14,8 +23,10 @@ interface AzkarSequenceProps {
   increment: (id: string, target: number) => void;
   complete: (id: string, target: number) => void;
   reset: (id: string) => void;
+  resetAll: () => void;
   completedCount: number;
   totalCount: number;
+  periodLabel: "الصباحية" | "المسائية";
 }
 
 /** One-dhikr-at-a-time reading flow. Navigation stays independent from
@@ -33,13 +44,19 @@ function AzkarSequenceContent({
   increment,
   complete,
   reset,
+  resetAll,
   completedCount,
   totalCount,
+  periodLabel,
 }: AzkarSequenceProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [announcement, setAnnouncement] = useState("");
+  const [completionOpen, setCompletionOpen] = useState(false);
   const completionRef = useRef<{ id: string; complete: boolean } | null>(null);
+  const sequenceComplete = totalCount > 0 && completedCount >= totalCount;
+  const sequenceCompletionRef = useRef(sequenceComplete);
   const { enabled: autoAdvanceEnabled } = useAutoAdvancePreference();
+  const router = useRouter();
 
   const currentDhikr = items[currentIndex];
   const currentCount = getCount(currentDhikr.id);
@@ -72,6 +89,21 @@ function AzkarSequenceContent({
 
     return () => window.clearTimeout(timeoutId);
   }, [autoAdvanceEnabled, currentDhikr.id, currentIsComplete, isLast, items.length]);
+
+  useEffect(() => {
+    const wasComplete = sequenceCompletionRef.current;
+    sequenceCompletionRef.current = sequenceComplete;
+
+    if (!wasComplete && sequenceComplete) {
+      setCompletionOpen(true);
+    }
+  }, [sequenceComplete]);
+
+  const returnHomeAndReset = () => {
+    resetAll();
+    setCompletionOpen(false);
+    router.push("/");
+  };
 
   const goNext = () => {
     if (isLast) return;
@@ -117,12 +149,25 @@ function AzkarSequenceContent({
         </Alert>
       ) : null}
 
-      {isLast && totalCount > 0 && remainingCount === 0 ? (
-        <Alert className="border-primary/40 bg-primary/5">
-          <CircleCheck aria-hidden="true" />
-          <AlertTitle>أحسنت! أتممت كل الأذكار 🎉</AlertTitle>
-        </Alert>
-      ) : null}
+      <Dialog open={completionOpen} onOpenChange={setCompletionOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <span className="flex size-14 items-center justify-center rounded-full bg-primary/10 text-primary">
+              <PartyPopper aria-hidden="true" className="size-7" />
+            </span>
+            <DialogTitle>تهانينا لك!</DialogTitle>
+            <DialogDescription className="text-base">
+              لقد أتممت جميع الأذكار {periodLabel}. تقبّل الله منك.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button type="button" onClick={returnHomeAndReset} className="w-full sm:w-auto">
+              <House aria-hidden="true" />
+              الانتقال إلى الرئيسية
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <div className="flex items-center justify-between gap-3">
         <Button

@@ -18,6 +18,7 @@ export function EveningAzkarView({ items }: EveningAzkarViewProps) {
     increment,
     complete,
     reset,
+    resetAll,
     completedCount,
     fractionalCompletedCount,
     totalCount,
@@ -37,8 +38,10 @@ export function EveningAzkarView({ items }: EveningAzkarViewProps) {
         increment={increment}
         complete={complete}
         reset={reset}
+        resetAll={resetAll}
         completedCount={completedCount}
         totalCount={totalCount}
+        periodLabel="المسائية"
       />
     </div>
   );
