@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { AzkarCounter } from "@/components/shared/azkar-counter";
+import { ShareDhikrButton } from "@/components/shared/share-dhikr-button";
 import { useFavorites } from "@/hooks/use-favorites";
 import { useCounterPreference } from "@/hooks/use-counter-preference";
 import { cn } from "@/lib/utils";
@@ -44,7 +45,7 @@ export function AzkarCard({ dhikr, counter }: AzkarCardProps) {
   const verses = dhikr.text.split("*").map((verse) => verse.trim());
 
   return (
-    <Card className="h-[520px] w-full scroll-mt-20 sm:h-[440px]">
+    <Card className="relative h-[520px] w-full scroll-mt-20 sm:h-[440px]">
       {/* `contents` removes this element from the box model so CardHeader/
           CardContent/CardFooter remain direct flex participants of Card's
           own flex/gap layout, while keeping <article> in the DOM/a11y tree
@@ -112,7 +113,12 @@ export function AzkarCard({ dhikr, counter }: AzkarCardProps) {
           </div>
         </CardContent>
 
-        <CardFooter className={cn(counter ? "justify-center" : "justify-end")}>
+        {/* pl-12 reserves room for the floating share button pinned to the
+            card's bottom-left corner below; the static repetition badge
+            (favorites view, no counter) is start-aligned — i.e. the right
+            side under dir="rtl" — instead of its old end/left placement,
+            which used to sit exactly where the share button now lives. */}
+        <CardFooter className={cn("pl-12", counter ? "justify-center" : "justify-start")}>
           {counter ? (
             <AzkarCounter
               current={counter.current}
@@ -129,6 +135,8 @@ export function AzkarCard({ dhikr, counter }: AzkarCardProps) {
             </Badge>
           )}
         </CardFooter>
+
+        <ShareDhikrButton dhikr={dhikr} />
       </article>
     </Card>
   );
