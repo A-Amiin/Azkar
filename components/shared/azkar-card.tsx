@@ -44,7 +44,7 @@ export function AzkarCard({ dhikr, counter }: AzkarCardProps) {
   const verses = dhikr.text.split("*").map((verse) => verse.trim());
 
   return (
-    <Card className="h-[520px] scroll-mt-20 sm:h-[440px]">
+    <Card className="h-[520px] w-full scroll-mt-20 sm:h-[440px]">
       {/* `contents` removes this element from the box model so CardHeader/
           CardContent/CardFooter remain direct flex participants of Card's
           own flex/gap layout, while keeping <article> in the DOM/a11y tree
@@ -87,27 +87,29 @@ export function AzkarCard({ dhikr, counter }: AzkarCardProps) {
           </Tooltip>
         </CardHeader>
 
-        <CardContent className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto">
-          <p className="text-center text-lg leading-loose text-foreground sm:text-xl">
-            <span aria-hidden="true">﴿ </span>
-            {verses.map((verse, index) => (
-              <span key={index}>
-                {verse}
-                {index < verses.length - 1 ? (
-                  <span className="mx-1 text-primary" aria-hidden="true">
-                    ۝
-                  </span>
-                ) : null}
-              </span>
-            ))}
-            <span aria-hidden="true"> ﴾</span>
-          </p>
-
-          {dhikr.hadith ? (
-            <p className="rounded-md bg-muted px-3 py-2 text-sm text-muted-foreground">
-              {dhikr.hadith}
+        <CardContent className="min-h-0 flex-1 overflow-y-auto">
+          <div className="flex min-h-full flex-col justify-center gap-3">
+            <p className="text-center text-lg leading-loose text-foreground sm:text-xl">
+              <span aria-hidden="true">﴿ </span>
+              {verses.map((verse, index) => (
+                <span key={index}>
+                  {verse}
+                  {index < verses.length - 1 ? (
+                    <span className="mx-1 text-primary" aria-hidden="true">
+                      ۝
+                    </span>
+                  ) : null}
+                </span>
+              ))}
+              <span aria-hidden="true"> ﴾</span>
             </p>
-          ) : null}
+
+            {dhikr.hadith ? (
+              <p className="rounded-md bg-muted px-3 py-2 text-sm text-muted-foreground">
+                {dhikr.hadith}
+              </p>
+            ) : null}
+          </div>
         </CardContent>
 
         <CardFooter className={cn(counter ? "justify-center" : "justify-end")}>

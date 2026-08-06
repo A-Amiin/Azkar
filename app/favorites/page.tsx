@@ -11,7 +11,7 @@ export const metadata: Metadata = buildMetadata({
 
 export default function FavoritesPage() {
   return (
-    <section className="mx-auto flex max-w-3xl flex-col gap-6 px-4 py-6">
+    <section className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-6">
       <PageHeading
         title="الأذكار المفضلة"
         description="الأذكار التي أضفتها إلى المفضلة من صفحتي الصباح والمساء."

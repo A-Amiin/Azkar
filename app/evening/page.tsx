@@ -14,7 +14,7 @@ export default function EveningPage() {
   const { title, items } = getEveningAzkar();
 
   return (
-    <section className="mx-auto flex max-w-3xl flex-col gap-6 px-4 py-6">
+    <section className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-6">
       <PageHeading
         title={title}
         description="حافظ على أذكارك اليومية، واضغط على كل ذكر لعدّ التكرار."
