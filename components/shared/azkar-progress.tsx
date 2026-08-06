@@ -34,15 +34,15 @@ export function AzkarProgress({
       className="flex-col items-stretch gap-2"
     >
       <div className="flex items-center justify-between text-sm">
-        <span className="font-medium text-foreground">التقدّم اليوم</span>
-        <div className="flex items-center gap-2 text-muted-foreground">
+        <div className="flex items-center gap-2">
+          <span className="font-medium text-foreground">التقدّم اليوم</span>
           <span dir="ltr" className="font-medium tabular-nums text-foreground">
             {formattedPercentage}%
           </span>
-          <span dir="ltr" className="tabular-nums">
-            {completedCount} / {totalCount} ذكر
-          </span>
         </div>
+        <span dir="ltr" className="tabular-nums text-muted-foreground">
+          {completedCount} / {totalCount} ذكر
+        </span>
       </div>
     </Progress>
   );
