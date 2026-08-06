@@ -89,7 +89,7 @@ export function AzkarCard({ dhikr, counter }: AzkarCardProps) {
 
         <CardContent className="min-h-0 flex-1 overflow-y-auto">
           <div className="flex min-h-full flex-col justify-center gap-3">
-            <p className="text-center text-lg leading-loose text-foreground dark:text-white sm:text-xl">
+            <p className="text-center text-lg leading-loose text-foreground [html[data-theme=dark]_&]:text-white sm:text-xl">
               <span aria-hidden="true">﴿ </span>
               {verses.map((verse, index) => (
                 <span key={index}>
@@ -105,7 +105,7 @@ export function AzkarCard({ dhikr, counter }: AzkarCardProps) {
             </p>
 
             {dhikr.hadith ? (
-              <p className="rounded-md bg-muted px-3 py-2 text-sm text-muted-foreground dark:text-white">
+              <p className="rounded-md bg-muted px-3 py-2 text-sm text-muted-foreground [html[data-theme=dark]_&]:text-white">
                 {dhikr.hadith}
               </p>
             ) : null}
