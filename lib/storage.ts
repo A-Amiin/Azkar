@@ -48,7 +48,12 @@ export interface AutoAdvancePreferenceSchemaV1 {
   enabled: boolean;
 }
 
-export type FontSizePreference = "small" | "medium" | "large";
+export type FontSizePreference =
+  | "small"
+  | "medium"
+  | "large"
+  | "xlarge"
+  | "xxlarge";
 
 export interface FontPreferenceSchemaV1 {
   version: 1;
