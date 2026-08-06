@@ -41,7 +41,7 @@ export function AzkarProgress({
           </bdi>
         </div>
         <span dir="ltr" className="tabular-nums text-muted-foreground">
-          {completedCount} / {totalCount} ذكر
+          ذكر ({completedCount} / {totalCount})
         </span>
       </div>
     </Progress>
