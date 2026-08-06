@@ -36,9 +36,9 @@ export function AzkarProgress({
       <div className="flex items-center justify-between text-sm">
         <div className="flex items-center gap-2">
           <span className="font-medium text-foreground">التقدّم اليوم</span>
-          <span dir="ltr" className="font-medium tabular-nums text-foreground">
+          <bdi dir="ltr" className="font-medium tabular-nums text-foreground">
             {formattedPercentage}%
-          </span>
+          </bdi>
         </div>
         <span dir="ltr" className="tabular-nums text-muted-foreground">
           {completedCount} / {totalCount} ذكر
