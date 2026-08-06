@@ -34,10 +34,16 @@ export function FontSizePicker() {
         value={size}
         onValueChange={(value) => setSize(value as FontSizePreference)}
       >
-        <SelectTrigger id="font-size-select" className="w-full sm:max-w-xs">
+        <SelectTrigger
+          id="font-size-select"
+          className="w-full bg-white text-neutral-950 dark:bg-white dark:text-neutral-950"
+        >
           <SelectValue />
         </SelectTrigger>
-        <SelectContent align="start">
+        <SelectContent
+          align="start"
+          className="bg-white text-neutral-950 dark:bg-white dark:text-neutral-950"
+        >
           {FONT_OPTIONS.map((option) => (
             <SelectItem key={option.value} value={option.value}>
               {option.label} — {option.pixels}px
