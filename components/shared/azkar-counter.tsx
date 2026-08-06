@@ -64,36 +64,44 @@ export function AzkarCounter({
 
   if (style === "balanced") {
     return (
-      <div className="flex w-full items-center justify-center gap-3">
-        <output
-          className="inline-flex min-h-11 min-w-24 items-center justify-center rounded-md bg-secondary px-4 text-base font-medium tabular-nums text-secondary-foreground"
-          aria-label={`العدد ${current} من ${target}`}
-        >
-          {current} / {target}
-        </output>
+      <div className="relative flex min-h-11 w-full items-center justify-center">
+        <div className="flex items-center justify-center gap-3">
+          <output
+            className="inline-flex min-h-11 min-w-24 items-center justify-center rounded-md bg-secondary px-4 text-base font-medium tabular-nums text-secondary-foreground"
+            aria-label={`العدد ${current} من ${target}`}
+          >
+            {current} / {target}
+          </output>
 
-        <Button
-          type="button"
-          size="icon"
-          onClick={onIncrement}
-          disabled={isComplete}
-          aria-label={`زيادة عداد ${label}`}
-        >
-          <Plus aria-hidden="true" />
-        </Button>
+          <Button
+            type="button"
+            size="icon"
+            onClick={onIncrement}
+            disabled={isComplete}
+            aria-label={`زيادة عداد ${label}`}
+          >
+            <Plus aria-hidden="true" />
+          </Button>
+        </div>
 
-        {fillButton}
+        {fillButton ? (
+          <div className="absolute right-0 top-1/2 -translate-y-1/2">
+            {fillButton}
+          </div>
+        ) : null}
 
-        <Button
-          type="button"
-          variant="outline"
-          size="icon"
-          onClick={onReset}
-          disabled={current === 0}
-          aria-label={`إعادة عداد ${label} إلى صفر`}
-        >
-          <RotateCcw aria-hidden="true" />
-        </Button>
+        <div className="absolute left-0 top-1/2 -translate-y-1/2">
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            onClick={onReset}
+            disabled={current === 0}
+            aria-label={`إعادة عداد ${label} إلى صفر`}
+          >
+            <RotateCcw aria-hidden="true" />
+          </Button>
+        </div>
 
         {milestoneAnnouncement}
       </div>
@@ -103,10 +111,10 @@ export function AzkarCounter({
   // "compact" — a tappable circular progress ring: the fill grows with
   // every tap, so progress is visible at a glance instead of only as text,
   // and a checkmark badge replaces the number once complete. Centered as a
-  // group with its reset button, sized well above the 44px touch-target
+  // with its actions pinned to opposite edges, sized well above the 44px touch-target
   // minimum for comfortable one-handed use.
   return (
-    <div className="flex w-full items-center justify-center gap-4">
+    <div className="relative flex min-h-16 w-full items-center justify-center">
       <div
         className={cn(
           "flex items-center gap-1.5",
@@ -147,18 +155,24 @@ export function AzkarCounter({
         </span>
       </div>
 
-      {fillButton}
+      {fillButton ? (
+        <div className="absolute right-0 top-1/2 -translate-y-1/2">
+          {fillButton}
+        </div>
+      ) : null}
 
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon"
-        onClick={onReset}
-        disabled={current === 0}
-        aria-label={`إعادة عداد ${label} إلى صفر`}
-      >
-        <RotateCcw aria-hidden="true" />
-      </Button>
+      <div className="absolute left-0 top-1/2 -translate-y-1/2">
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          onClick={onReset}
+          disabled={current === 0}
+          aria-label={`إعادة عداد ${label} إلى صفر`}
+        >
+          <RotateCcw aria-hidden="true" />
+        </Button>
+      </div>
 
       {milestoneAnnouncement}
     </div>
