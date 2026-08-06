@@ -62,9 +62,18 @@ export function AzkarCounter({
     </Tooltip>
   ) : null;
 
+  const mobileFillHint = target > 1 ? (
+    <p className="flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary sm:hidden">
+      <CheckCheck aria-hidden="true" className="size-3.5" />
+      إكمال العدد دفعة واحدة
+    </p>
+  ) : null;
+
   if (style === "balanced") {
     return (
-      <div className="flex w-full justify-center">
+      <div className="flex w-full flex-col items-center gap-2">
+        {mobileFillHint}
+
         <div
           dir="ltr"
           className="inline-grid min-h-11 grid-cols-[5.5rem_auto_5.5rem] items-center gap-3"
@@ -115,7 +124,9 @@ export function AzkarCounter({
   // and a checkmark badge replaces the number once complete. The compact
   // control group stays centered, with fill on its right and reset on its left.
   return (
-    <div className="flex w-full justify-center">
+    <div className="flex w-full flex-col items-center gap-2">
+      {mobileFillHint}
+
       <div
         dir="ltr"
         className="inline-grid min-h-16 grid-cols-[2.75rem_auto_2.75rem] items-center gap-3"
