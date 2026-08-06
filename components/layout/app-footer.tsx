@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { RouteAwareFooter } from "@/components/layout/route-aware-footer";
 import { Separator } from "@/components/ui/separator";
 import { getEveningAzkar, getMorningAzkar } from "@/data/azkar";
 import { NAV_ITEMS, SITE_NAME } from "@/lib/constants";
@@ -8,7 +9,9 @@ export function AppFooter() {
   const evening = getEveningAzkar();
   const year = new Date().getFullYear();
 
-  return (
+  const copyright = `© ${year} ${SITE_NAME}`;
+
+  const fullFooter = (
     <footer className="border-t border-border bg-card">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 py-6 text-sm text-muted-foreground sm:px-6 lg:px-8">
         <nav aria-label="روابط التذييل">
@@ -47,10 +50,23 @@ export function AppFooter() {
           </a>
         </p>
 
-        <p>
-          © {year} {SITE_NAME}
-        </p>
+        <p>{copyright}</p>
       </div>
     </footer>
+  );
+
+  const copyrightFooter = (
+    <footer className="border-t border-border bg-card">
+      <p className="mx-auto w-full max-w-6xl px-4 py-4 text-center text-sm text-muted-foreground sm:px-6 lg:px-8">
+        {copyright}
+      </p>
+    </footer>
+  );
+
+  return (
+    <RouteAwareFooter
+      fullFooter={fullFooter}
+      copyrightFooter={copyrightFooter}
+    />
   );
 }
