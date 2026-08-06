@@ -1,6 +1,7 @@
 import { Heart, House, Settings2, Sunrise, Sunset, type LucideIcon } from "lucide-react";
 
 export const SITE_NAME = "أذكار الصباح والمساء";
+export const SITE_URL = "https://azkkar.vercel.app/";
 
 export interface NavItem {
   href: string;

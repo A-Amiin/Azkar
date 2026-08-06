@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import { SITE_NAME } from "@/lib/constants";
+import { SITE_NAME, SITE_URL } from "@/lib/constants";
 
 export const siteConfig = {
   name: SITE_NAME,
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://azkar.example.com",
+  url: SITE_URL,
   locale: "ar_AR",
   // Browser-chrome tint (<meta name="theme-color">, manifest theme_color) —
   // matches --primary in each mode.

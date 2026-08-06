@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/sheet";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { generateDhikrShareImage } from "@/lib/share-image";
+import { SITE_URL } from "@/lib/constants";
 import { siteConfig } from "@/lib/metadata";
 import type { Dhikr } from "@/types/azkar";
 
@@ -38,7 +39,9 @@ export function ShareDhikrButton({ dhikr }: ShareDhikrButtonProps) {
   }, []);
 
   const shareText = `${dhikr.text.replace(/\*/g, " ").slice(0, 120)}\n\n${siteConfig.name}`;
-  const shareUrl = siteConfig.url;
+  // Every dhikr shares the public app homepage. Individual dhikr routes do
+  // not exist yet, so generating a per-item URL would create broken links.
+  const shareUrl = SITE_URL;
 
   const openFallback = (blob: Blob) => {
     if (objectUrlRef.current) URL.revokeObjectURL(objectUrlRef.current);
