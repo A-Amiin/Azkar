@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { AutoAdvanceToggle } from "@/app/customization/components/auto-advance-toggle";
 import { CounterStylePicker } from "@/app/customization/components/counter-style-picker";
 import { FontSizePicker } from "@/app/customization/components/font-size-picker";
+import { NotificationSettings } from "@/app/customization/components/notification-settings";
 import { ThemePicker } from "@/app/customization/components/theme-picker";
 import { Separator } from "@/components/ui/separator";
 
@@ -72,6 +73,21 @@ export default function CustomizationPage() {
           </p>
         </div>
         <CounterStylePicker />
+      </section>
+
+      <Separator />
+
+      <section className="space-y-4" aria-labelledby="notifications-heading">
+        <div className="space-y-1">
+          <h2 id="notifications-heading" className="font-heading text-xl font-bold">
+            الإشعارات
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            فعّل تذكيرات أذكار الصباح والمساء على هذا الجهاز. لن يُطلب إذن
+            الإشعارات إلا بعد ضغطك على زر التفعيل.
+          </p>
+        </div>
+        <NotificationSettings />
       </section>
     </section>
   );

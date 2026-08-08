@@ -3,6 +3,7 @@
 import { AzkarProgress } from "@/components/shared/azkar-progress";
 import { AzkarSequence } from "@/components/shared/azkar-sequence";
 import { useMorningProgress } from "@/app/morning/hooks/use-morning-progress";
+import { useMarkPeriodSeen } from "@/hooks/use-mark-period-seen";
 import type { Dhikr } from "@/types/azkar";
 
 interface MorningAzkarViewProps {
@@ -11,8 +12,12 @@ interface MorningAzkarViewProps {
 
 /** The route's one client boundary: owns the morning progress hook and
  *  threads counter state down into the (purely presentational, shared)
- *  AzkarProgress/AzkarCard components. */
+ *  AzkarProgress/AzkarCard components. Also marks the morning period
+ *  "seen" for notification purposes (cancels the second reminder) —
+ *  see hooks/use-mark-period-seen.ts. */
 export function MorningAzkarView({ items }: MorningAzkarViewProps) {
+  useMarkPeriodSeen("morning");
+
   const {
     getCount,
     increment,

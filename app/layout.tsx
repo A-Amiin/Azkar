@@ -8,6 +8,7 @@ import { AppHeader } from "@/components/layout/app-header";
 import { FontPreferenceSync } from "@/components/layout/font-preference-sync";
 import { ThemePreferenceSync } from "@/components/layout/theme-preference-sync";
 import { ServiceWorkerRegistration } from "@/components/layout/service-worker-registration";
+import { OneSignalInit } from "@/components/providers/onesignal-init";
 import { SplashScreen } from "@/components/layout/splash-screen";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
@@ -98,6 +99,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <FontPreferenceSync />
         <ThemePreferenceSync />
         <ServiceWorkerRegistration />
+        <OneSignalInit />
       </body>
     </html>
   );

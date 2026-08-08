@@ -15,6 +15,7 @@ export const STORAGE_KEYS = {
   fontPreference: "azkar:font-preference",
   themePreference: "azkar:theme-preference",
   uiState: "azkar:ui-state",
+  notificationPreference: "azkar:notification-preference",
 } as const;
 
 export interface FavoritesSchemaV1 {
@@ -34,6 +35,20 @@ export interface ProgressSchemaV1 {
 export interface UiStateSchemaV1 {
   version: 1;
   installTipDismissed: boolean;
+}
+
+/** Local mirror of the two OneSignal Data Tags (morning_state /
+ *  evening_state) — NOT the source of truth. The Cron Route Handlers only
+ *  ever read the actual OneSignal tag when deciding whether to send; this
+ *  mirror exists purely so the customization page can render the toggle
+ *  state instantly (no async getTags() round trip) and so intent survives
+ *  before the OneSignal SDK has finished loading. See
+ *  hooks/use-notification-preference.ts, which keeps this in sync with
+ *  the real tag on every write and reconciles it from getTags() on mount. */
+export interface NotificationPreferenceSchemaV1 {
+  version: 1;
+  morningEnabled: boolean;
+  eveningEnabled: boolean;
 }
 
 export type CounterStyle = "compact" | "balanced";
@@ -76,6 +91,7 @@ export interface StorageSchemaMap {
   [STORAGE_KEYS.fontPreference]: FontPreferenceSchemaV1;
   [STORAGE_KEYS.themePreference]: ThemePreferenceSchemaV1;
   [STORAGE_KEYS.uiState]: UiStateSchemaV1;
+  [STORAGE_KEYS.notificationPreference]: NotificationPreferenceSchemaV1;
 }
 
 export type StorageKey = keyof StorageSchemaMap;
