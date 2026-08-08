@@ -4,7 +4,9 @@ import { BellRing, CheckCircle2, ShieldAlert, ShieldX, Smartphone } from "lucide
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import { useNotificationPermission } from "@/hooks/use-notification-permission";
+import { useNotificationPreference } from "@/hooks/use-notification-preference";
 import { usePwaInstall } from "@/hooks/use-pwa-install";
 
 /** Notification settings section for /customization/. This first version
@@ -17,6 +19,12 @@ export function NotificationSettings() {
   const { status, isRequesting, error, requestPermission } =
     useNotificationPermission();
   const { isIOS, isStandalone } = usePwaInstall();
+  const {
+    morningEnabled,
+    eveningEnabled,
+    setMorningEnabled,
+    setEveningEnabled,
+  } = useNotificationPreference();
 
   // iOS Safari has no Web Push API at all outside an installed, standalone
   // PWA — regardless of iOS version. Show install instructions instead of
@@ -57,6 +65,33 @@ export function NotificationSettings() {
               {isRequesting ? "جارٍ التفعيل..." : "تفعيل الإشعارات"}
             </Button>
           )}
+        </div>
+      )}
+
+      {status === "granted" && (
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div className="flex items-center justify-between gap-4 rounded-xl border p-4">
+            <label htmlFor="morning-reminders" className="cursor-pointer font-medium">
+              تذكيرات الصباح
+            </label>
+            <Switch
+              id="morning-reminders"
+              checked={morningEnabled}
+              onCheckedChange={setMorningEnabled}
+              aria-label="تفعيل تذكيرات أذكار الصباح"
+            />
+          </div>
+          <div className="flex items-center justify-between gap-4 rounded-xl border p-4">
+            <label htmlFor="evening-reminders" className="cursor-pointer font-medium">
+              تذكيرات المساء
+            </label>
+            <Switch
+              id="evening-reminders"
+              checked={eveningEnabled}
+              onCheckedChange={setEveningEnabled}
+              aria-label="تفعيل تذكيرات أذكار المساء"
+            />
+          </div>
         </div>
       )}
 

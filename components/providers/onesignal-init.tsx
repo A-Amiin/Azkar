@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import Script from "next/script";
+import { runOnOneSignal } from "@/lib/onesignal-client";
 
 const ONESIGNAL_APP_ID = process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID;
 
@@ -24,8 +25,7 @@ export function OneSignalInit() {
     // necessarily finishes loading — this is OneSignal's documented
     // pattern: the queue is drained as soon as the SDK becomes ready,
     // regardless of the order these two things happen in.
-    window.OneSignalDeferred = window.OneSignalDeferred || [];
-    window.OneSignalDeferred.push(async (OneSignal) => {
+    runOnOneSignal(async (OneSignal) => {
       await OneSignal.init({
         appId: ONESIGNAL_APP_ID,
         // Our service worker lives at /sw.js, not OneSignal's default

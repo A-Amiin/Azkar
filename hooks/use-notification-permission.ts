@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useState, useSyncExternalStore } from "react";
+import { runOnOneSignal } from "@/lib/onesignal-client";
 
 export type NotificationSupportStatus =
   | "unsupported"
@@ -75,8 +76,7 @@ export function useNotificationPermission(): UseNotificationPermissionResult {
     setIsRequesting(true);
     try {
       const granted = await new Promise<boolean>((resolve, reject) => {
-        window.OneSignalDeferred = window.OneSignalDeferred || [];
-        window.OneSignalDeferred.push(async (OneSignal) => {
+        runOnOneSignal(async (OneSignal) => {
           try {
             resolve(await OneSignal.Notifications.requestPermission());
           } catch (sdkError) {
