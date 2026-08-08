@@ -5,7 +5,11 @@
  * handler) and not a fixed clock time (Asr drifts by roughly 90 minutes
  * across the year). See NOTIFICATIONS_PLAN.md section 12.
  *
- * Server-only.
+ * Pure date/astronomical math (no Node-only APIs), so this is safe to
+ * import from both Route Handlers (lib/notification-schedule.ts, server
+ * side) and the client-side "mark period seen" hook, which needs the same
+ * Asr cutoff to decide whether entering /evening/ counts as within the
+ * evening window.
  */
 
 import { Coordinates, CalculationMethod, Madhab, PrayerTimes } from "adhan";

@@ -1,0 +1,128 @@
+/**
+ * Server-only OneSignal REST API client. Never import this from a
+ * "use client" file — it reads `ONESIGNAL_REST_API_KEY`, which must never
+ * reach the browser bundle. See NOTIFICATIONS_PLAN.md sections 14 and 21.
+ */
+
+import "server-only";
+import { v5 as uuidv5 } from "uuid";
+import { todayCairoDate } from "@/lib/cairo-time";
+import { TAG_DISABLED_VALUE } from "@/lib/notification-schedule";
+import type { NotificationCopy } from "@/lib/notification-copy";
+
+const ONESIGNAL_API_URL = "https://api.onesignal.com/notifications";
+
+// Fixed namespace for deriving deterministic idempotency keys (UUID v5).
+// Not a secret — it only needs to be stable so the same logical send
+// (slot + date) always maps to the same idempotency_key.
+const IDEMPOTENCY_NAMESPACE = "0109111b-4a3b-431b-b9d7-88c997a34f6a";
+
+type OneSignalFilter =
+  | { field: "tag"; key: string; relation: "not_exists" }
+  | { field: "tag"; key: string; relation: "!="; value: string }
+  | { operator: "OR" | "AND" };
+
+/**
+ * Builds the `filters` array for one reminder slot's send.
+ *
+ * First reminder of a period: exclude only users who explicitly disabled
+ * it (`tag == "off"`); a missing tag or any date value still passes.
+ *   (not_exists) OR (!= "off")
+ *
+ * Second reminder: same, AND also exclude users already marked as having
+ * seen the period today.
+ *   ((not_exists) OR (!= "off")) AND (!= today)
+ *
+ * Evaluated by OneSignal left-to-right (no parentheses support), which
+ * naturally produces the grouping above — see NOTIFICATIONS_PLAN.md
+ * section 11 for the caveat that this must be verified against real test
+ * devices before going live (OneSignal's docs don't fully spell out
+ * `not_exists` interaction with chained OR/AND).
+ */
+export function buildFilters(
+  tagKey: string,
+  options: { excludeSeenToday: boolean }
+): OneSignalFilter[] {
+  const filters: OneSignalFilter[] = [
+    { field: "tag", key: tagKey, relation: "not_exists" },
+    { operator: "OR" },
+    { field: "tag", key: tagKey, relation: "!=", value: TAG_DISABLED_VALUE },
+  ];
+
+  if (options.excludeSeenToday) {
+    filters.push(
+      { operator: "AND" },
+      { field: "tag", key: tagKey, relation: "!=", value: todayCairoDate() }
+    );
+  }
+
+  return filters;
+}
+
+/** Deterministic idempotency key for a given slot on a given Cairo date —
+ *  retrying the same Cron invocation (e.g. after a network error) never
+ *  produces a duplicate notification. Valid per OneSignal for 30 days. */
+export function idempotencyKeyFor(slotId: string, date: string): string {
+  return uuidv5(`${slotId}:${date}`, IDEMPOTENCY_NAMESPACE);
+}
+
+export interface SendNotificationOptions {
+  copy: NotificationCopy;
+  filters: OneSignalFilter[];
+  idempotencyKey: string;
+}
+
+/** Sends one notification immediately via the OneSignal REST API — never
+ *  via `send_after`/internal scheduling (see NOTIFICATIONS_PLAN.md section
+ *  11 for why). Retries once on 429/5xx with a short backoff. Never logs
+ *  the Authorization header or the API key. */
+export async function sendNotification({
+  copy,
+  filters,
+  idempotencyKey,
+}: SendNotificationOptions): Promise<{ ok: boolean; status: number }> {
+  const appId = process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID;
+  const apiKey = process.env.ONESIGNAL_REST_API_KEY;
+
+  if (!appId || !apiKey) {
+    throw new Error(
+      "Missing NEXT_PUBLIC_ONESIGNAL_APP_ID or ONESIGNAL_REST_API_KEY"
+    );
+  }
+
+  const body = JSON.stringify({
+    app_id: appId,
+    idempotency_key: idempotencyKey,
+    filters,
+    headings: { ar: copy.title },
+    contents: { ar: copy.body },
+    url: copy.url,
+    web_push_topic: copy.topic,
+    data: copy.data,
+  });
+
+  const attempt = async () =>
+    fetch(ONESIGNAL_API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Key ${apiKey}`,
+      },
+      body,
+    });
+
+  let response = await attempt();
+
+  if (response.status === 429 || response.status >= 500) {
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    response = await attempt();
+  }
+
+  if (!response.ok) {
+    // Deliberately no response body/headers in the log — could echo back
+    // request data, and never risk logging anything auth-adjacent.
+    console.error(`OneSignal notification send failed: HTTP ${response.status}`);
+  }
+
+  return { ok: response.ok, status: response.status };
+}

@@ -5,9 +5,11 @@
  * even if Egypt's DST rules change again in the future — see
  * NOTIFICATIONS_PLAN.md section 12 for why that matters here.
  *
- * Server-only: used by the notification Cron Route Handlers to decide
- * "is it currently a valid moment to send this reminder" independently of
- * exactly when Vercel Cron happened to invoke the function.
+ * Used by the notification Cron Route Handlers to decide "is it currently
+ * a valid moment to send this reminder" independently of exactly when
+ * Vercel Cron happened to invoke the function, and by the client-side
+ * "mark period seen" hook to decide whether a page visit falls inside the
+ * period's window. No Node-only APIs, so it's safe on both sides.
  */
 
 const CAIRO_TZ = "Africa/Cairo";
