@@ -1,6 +1,6 @@
 "use client";
 
-import { BellRing, CheckCircle2, ShieldAlert, ShieldX, Smartphone } from "lucide-react";
+import { BellRing, CheckCircle2, Send, ShieldAlert, ShieldX, Smartphone } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -8,13 +8,13 @@ import { Switch } from "@/components/ui/switch";
 import { useNotificationPermission } from "@/hooks/use-notification-permission";
 import { useNotificationPreference } from "@/hooks/use-notification-preference";
 import { usePwaInstall } from "@/hooks/use-pwa-install";
+import { useSendTestNotification } from "@/hooks/use-send-test-notification";
 
-/** Notification settings section for /customization/. This first version
- *  covers only the browser permission flow — enable/disable per-period
- *  reminders (morning_state/evening_state tags) is added on top of this
- *  once lib/use-notification-preference.ts lands, per
- *  NOTIFICATIONS_PLAN.md's phased rollout (section 24). Never requests
- *  permission on mount — only in response to the button's onClick. */
+/** Notification settings section for /customization/ — permission status
+ *  and request flow, per-period enable/disable toggles, iOS install
+ *  instructions, and a test-notification button. Never requests
+ *  permission on mount — only in response to the button's onClick. See
+ *  NOTIFICATIONS_PLAN.md sections 8 and 17. */
 export function NotificationSettings() {
   const { status, isRequesting, error, requestPermission } =
     useNotificationPermission();
@@ -25,6 +25,12 @@ export function NotificationSettings() {
     setMorningEnabled,
     setEveningEnabled,
   } = useNotificationPreference();
+  const {
+    isSending: isSendingTest,
+    error: testError,
+    success: testSucceeded,
+    sendTestNotification,
+  } = useSendTestNotification();
 
   // iOS Safari has no Web Push API at all outside an installed, standalone
   // PWA — regardless of iOS version. Show install instructions instead of
@@ -93,6 +99,32 @@ export function NotificationSettings() {
             />
           </div>
         </div>
+      )}
+
+      {status === "granted" && (
+        <div className="flex flex-wrap items-center gap-3">
+          <Button
+            variant="outline"
+            onClick={() => void sendTestNotification()}
+            disabled={isSendingTest}
+          >
+            <Send />
+            {isSendingTest ? "جارٍ الإرسال..." : "إرسال إشعار تجريبي"}
+          </Button>
+          {testSucceeded && (
+            <p className="text-sm text-muted-foreground">
+              تم الإرسال — تحقّق من إشعارات هذا الجهاز.
+            </p>
+          )}
+        </div>
+      )}
+
+      {testError && (
+        <Alert variant="destructive">
+          <ShieldAlert />
+          <AlertTitle>تعذّر الإرسال التجريبي</AlertTitle>
+          <AlertDescription>{testError}</AlertDescription>
+        </Alert>
       )}
 
       {error && (

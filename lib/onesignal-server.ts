@@ -5,7 +5,7 @@
  */
 
 import "server-only";
-import { v5 as uuidv5 } from "uuid";
+import { v4 as uuidv4, v5 as uuidv5 } from "uuid";
 import { todayCairoDate } from "@/lib/cairo-time";
 import { TAG_DISABLED_VALUE } from "@/lib/notification-schedule";
 import type { NotificationCopy } from "@/lib/notification-copy";
@@ -66,21 +66,15 @@ export function idempotencyKeyFor(slotId: string, date: string): string {
   return uuidv5(`${slotId}:${date}`, IDEMPOTENCY_NAMESPACE);
 }
 
-export interface SendNotificationOptions {
-  copy: NotificationCopy;
-  filters: OneSignalFilter[];
-  idempotencyKey: string;
-}
-
-/** Sends one notification immediately via the OneSignal REST API — never
- *  via `send_after`/internal scheduling (see NOTIFICATIONS_PLAN.md section
- *  11 for why). Retries once on 429/5xx with a short backoff. Never logs
- *  the Authorization header or the API key. */
-export async function sendNotification({
-  copy,
-  filters,
-  idempotencyKey,
-}: SendNotificationOptions): Promise<{ ok: boolean; status: number }> {
+/** Posts one notification create request to the OneSignal REST API.
+ *  Retries once on 429/5xx with a short backoff. Never logs the
+ *  Authorization header, the API key, or the response body (which could
+ *  echo back request data). Shared by both sendNotification() (the
+ *  scheduled reminders, targeted by `filters`) and
+ *  sendTestNotification() (targeted at exactly one subscription). */
+async function postToOneSignal(
+  body: Record<string, unknown>
+): Promise<{ ok: boolean; status: number }> {
   const appId = process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID;
   const apiKey = process.env.ONESIGNAL_REST_API_KEY;
 
@@ -90,16 +84,7 @@ export async function sendNotification({
     );
   }
 
-  const body = JSON.stringify({
-    app_id: appId,
-    idempotency_key: idempotencyKey,
-    filters,
-    headings: { ar: copy.title },
-    contents: { ar: copy.body },
-    url: copy.url,
-    web_push_topic: copy.topic,
-    data: copy.data,
-  });
+  const payload = JSON.stringify({ app_id: appId, ...body });
 
   const attempt = async () =>
     fetch(ONESIGNAL_API_URL, {
@@ -108,7 +93,7 @@ export async function sendNotification({
         "Content-Type": "application/json",
         Authorization: `Key ${apiKey}`,
       },
-      body,
+      body: payload,
     });
 
   let response = await attempt();
@@ -119,10 +104,49 @@ export async function sendNotification({
   }
 
   if (!response.ok) {
-    // Deliberately no response body/headers in the log — could echo back
-    // request data, and never risk logging anything auth-adjacent.
     console.error(`OneSignal notification send failed: HTTP ${response.status}`);
   }
 
   return { ok: response.ok, status: response.status };
+}
+
+export interface SendNotificationOptions {
+  copy: NotificationCopy;
+  filters: OneSignalFilter[];
+  idempotencyKey: string;
+}
+
+/** Sends one scheduled reminder immediately via the OneSignal REST API —
+ *  never via `send_after`/internal scheduling (see NOTIFICATIONS_PLAN.md
+ *  section 11 for why). */
+export async function sendNotification({
+  copy,
+  filters,
+  idempotencyKey,
+}: SendNotificationOptions): Promise<{ ok: boolean; status: number }> {
+  return postToOneSignal({
+    idempotency_key: idempotencyKey,
+    filters,
+    headings: { ar: copy.title },
+    contents: { ar: copy.body },
+    url: copy.url,
+    web_push_topic: copy.topic,
+    data: copy.data,
+  });
+}
+
+/** Sends a one-off test notification to exactly one OneSignal push
+ *  subscription — never a segment/filter, so the worst-case abuse of this
+ *  (publicly reachable, no CRON_SECRET) endpoint is a user spamming their
+ *  own device. See app/api/notifications/test/route.ts and
+ *  NOTIFICATIONS_PLAN.md section 21. */
+export async function sendTestNotification(
+  subscriptionId: string
+): Promise<{ ok: boolean; status: number }> {
+  return postToOneSignal({
+    idempotency_key: uuidv4(),
+    include_subscription_ids: [subscriptionId],
+    headings: { ar: "🔔 إشعار تجريبي" },
+    contents: { ar: "وصلك هذا الإشعار بنجاح — كل شيء يعمل كما هو متوقع." },
+  });
 }
