@@ -4,6 +4,20 @@
 // fully static routes, no dynamic data) doesn't justify a build-time
 // bundling plugin on top of an already-bleeding-edge stack.
 //
+// OneSignal's Web Push logic (push + notificationclick listeners, plus its
+// own install/activate handling) is merged into this same file via
+// importScripts rather than registering a second service worker — this
+// app already owns /sw.js at the root, and the browser only allows one
+// active service worker per scope. The browser supports multiple
+// listeners per event type, so OneSignal's install/activate/push/
+// notificationclick handlers below run alongside — not instead of — the
+// caching logic in this file. Because the filename differs from
+// OneSignal's default (OneSignalSDKWorker.js), "Customize service worker
+// paths and filenames" must be enabled in the OneSignal dashboard and
+// `serviceWorkerPath: "sw.js"` passed to OneSignal.init() — see
+// NOTIFICATIONS_PLAN.md section 16.
+importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js");
+//
 // Strategy:
 //   - install: precache the app shell (the pages themselves, not their JS/
 //     CSS chunks — those self-populate below, so there's no hashed
