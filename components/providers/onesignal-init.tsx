@@ -4,6 +4,14 @@ import { useEffect } from "react";
 import Script from "next/script";
 import { ONESIGNAL_APP_ID, runOnOneSignal } from "@/lib/onesignal-client";
 
+// Module-level, not component state: React's Strict Mode intentionally
+// double-invokes effects in development (mount → cleanup → mount again) to
+// surface exactly this kind of bug, and OneSignal.init() is not idempotent
+// — calling it twice throws "SDK already initialized". A ref/state flag
+// wouldn't help (it resets on the simulated remount too); this needs to
+// survive across that remount, which only a module-scope variable does.
+let hasInitialized = false;
+
 /** Loads and initializes the OneSignal Web SDK, mirroring the pattern used
  *  by ServiceWorkerRegistration: a side-effect-only component rendered
  *  once from the root layout. This never requests notification permission
@@ -17,7 +25,8 @@ import { ONESIGNAL_APP_ID, runOnOneSignal } from "@/lib/onesignal-client";
  *  renders nothing and the rest of the app is unaffected. */
 export function OneSignalInit() {
   useEffect(() => {
-    if (!ONESIGNAL_APP_ID) return;
+    if (!ONESIGNAL_APP_ID || hasInitialized) return;
+    hasInitialized = true;
     // Captured locally: TS doesn't carry the guard's narrowing of an
     // imported binding across the closure below.
     const appId = ONESIGNAL_APP_ID;
