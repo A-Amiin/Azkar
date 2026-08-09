@@ -3,18 +3,20 @@
 import { useEffect, useRef } from "react";
 import { toast } from "sonner";
 
-/** Registers /OneSignalSDKWorker.js after mount (never during SSR/build)
- *  and surfaces a "new version available" toast when an update is
- *  waiting — the worker itself never calls skipWaiting() on its own (see
- *  public/OneSignalSDKWorker.js), so nothing swaps under the user without
- *  this explicit confirmation. Renders nothing; this is a pure
- *  side-effect component.
- *
- *  Filename note: this used to be /sw.js, renamed to OneSignal's default
- *  expected filename after `serviceWorkerPath` in OneSignal.init() proved
- *  unreliable in production — see public/OneSignalSDKWorker.js. */
+const APP_VERSION_STORAGE_KEY = "azkar-app-version";
+const UPDATE_TOAST_ID = "app-update-available";
+
+interface AppVersionResponse {
+  version?: unknown;
+}
+
+/** Registers the shared application/OneSignal service worker. Update notices
+ * are based on a build identifier, not `ServiceWorker.updatefound`: the
+ * imported OneSignal worker may change independently and must not announce a
+ * new Azkar release. */
 export function ServiceWorkerRegistration() {
   const hasReloaded = useRef(false);
+  const hasAcceptedUpdate = useRef(false);
 
   useEffect(() => {
     if (!("serviceWorker" in navigator)) return;
@@ -51,21 +53,55 @@ export function ServiceWorkerRegistration() {
       return;
     }
 
-    function promptForUpdate(worker: ServiceWorker) {
+    function promptForUpdate(
+      version: string,
+      registration: ServiceWorkerRegistration
+    ) {
       toast("نسخة جديدة من التطبيق متاحة", {
-        id: "sw-update-available",
+        id: UPDATE_TOAST_ID,
         action: {
           label: "تحديث",
           onClick: () => {
-            // Dismiss immediately — the reload triggered by controllerchange
-            // (below) will wipe it too, but this avoids any visible lag,
-            // and makes the intent explicit rather than incidental.
-            toast.dismiss("sw-update-available");
-            worker.postMessage({ type: "SKIP_WAITING" });
+            // Save first: after the reload this exact release is already
+            // acknowledged, so its toast cannot appear for a second time.
+            localStorage.setItem(APP_VERSION_STORAGE_KEY, version);
+            hasAcceptedUpdate.current = true;
+            toast.dismiss(UPDATE_TOAST_ID);
+
+            if (registration.waiting) {
+              registration.waiting.postMessage({ type: "SKIP_WAITING" });
+            } else {
+              window.location.reload();
+            }
           },
         },
         duration: Infinity,
       });
+    }
+
+    async function checkDeployedAppVersion(
+      registration: ServiceWorkerRegistration
+    ) {
+      const response = await fetch(`/app-version.json?t=${Date.now()}`, {
+        cache: "no-store",
+      });
+      if (!response.ok) return;
+
+      const payload = (await response.json()) as AppVersionResponse;
+      if (typeof payload.version !== "string" || !payload.version) return;
+
+      const storedVersion = localStorage.getItem(APP_VERSION_STORAGE_KEY);
+
+      // The first visit establishes a baseline silently. Only a later build
+      // is an update from this device's point of view.
+      if (!storedVersion) {
+        localStorage.setItem(APP_VERSION_STORAGE_KEY, payload.version);
+        return;
+      }
+
+      if (storedVersion !== payload.version) {
+        promptForUpdate(payload.version, registration);
+      }
     }
 
     let cancelled = false;
@@ -73,38 +109,23 @@ export function ServiceWorkerRegistration() {
     navigator.serviceWorker
       .register("/OneSignalSDKWorker.js", { updateViaCache: "none" })
       .then((registration) => {
-      if (cancelled) return;
+        if (cancelled) return;
 
-      // Deliberately NOT checking registration.waiting here. That check
-      // used to run on every single page load, and if a worker ever got
-      // stuck in "waiting" for any reason, it would re-show the prompt
-      // forever, every load, with no way to clear itself — the exact bug
-      // reported in testing (toast kept reappearing across many reloads
-      // with no new deploy in between). updatefound below already covers
-      // "a new version was detected during this load" — .register()
-      // itself triggers the browser's own update check as part of its
-      // normal algorithm, so this loses no real detection capability,
-      // only the redundant/unreliable path.
-      registration.addEventListener("updatefound", () => {
-        const installingWorker = registration.installing;
-        if (!installingWorker) return;
-
-        installingWorker.addEventListener("statechange", () => {
-          if (
-            installingWorker.state === "installed" &&
-            navigator.serviceWorker.controller
-          ) {
-            promptForUpdate(installingWorker);
-          }
+        // OneSignal's imported worker may trigger `updatefound` even when this
+        // app did not deploy. Only our generated build version drives the UI.
+        void checkDeployedAppVersion(registration).catch(() => {
+          // Progressive enhancement: offline/version-check failures never
+          // interfere with the rest of the application.
         });
-      });
       })
       .catch(() => {
         // The application remains usable if PWA registration is unavailable.
       });
 
     const onControllerChange = () => {
-      if (hasReloaded.current) return;
+      // A worker can change for OneSignal's own reasons. Reload automatically
+      // only when this user explicitly accepted an Azkar application update.
+      if (!hasAcceptedUpdate.current || hasReloaded.current) return;
       hasReloaded.current = true;
       window.location.reload();
     };

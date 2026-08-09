@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "prebuild": "node scripts/generate-app-version.mjs",
     "build": "next build",
     "preview": "npx serve@latest out",
     "lint": "eslint"
