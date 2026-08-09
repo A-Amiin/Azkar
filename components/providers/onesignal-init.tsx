@@ -31,10 +31,17 @@ export function OneSignalInit() {
         appId,
         // Our service worker lives at /sw.js, not OneSignal's default
         // OneSignalSDKWorker.js — see public/sw.js and
-        // NOTIFICATIONS_PLAN.md section 16. Requires "Customize service
-        // worker paths and filenames" enabled in the OneSignal dashboard.
+        // NOTIFICATIONS_PLAN.md section 16. Setting serviceWorkerPath here
+        // is sufficient on its own (confirmed against OneSignal's docs and
+        // SDK issue tracker, 2026-08-08) — the dashboard's "Customize
+        // service worker paths and filenames" toggle is an alternative to
+        // this, not an additional requirement on top of it.
         serviceWorkerPath: "sw.js",
         serviceWorkerParam: { scope: "/" },
+        // Per OneSignal's Web SDK setup docs: lets Web Push register over
+        // plain HTTP on localhost during local development, where there's
+        // no HTTPS. Never true in production.
+        allowLocalhostAsSecureOrigin: process.env.NODE_ENV === "development",
       });
     });
   }, []);

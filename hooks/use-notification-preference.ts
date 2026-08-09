@@ -35,18 +35,15 @@ export function useNotificationPreference(): UseNotificationPreferenceResult {
   );
 
   useEffect(() => {
-    runOnOneSignal(async (OneSignal) => {
-      try {
-        const tags = await OneSignal.User.getTags();
-        setPreference({
-          version: 1,
-          morningEnabled: tags[TAG_KEY.morning] !== TAG_DISABLED_VALUE,
-          eveningEnabled: tags[TAG_KEY.evening] !== TAG_DISABLED_VALUE,
-        });
-      } catch {
-        // No subscription yet, or a transient SDK/network error — leave the
-        // localStorage mirror (or its default) as the best available guess.
-      }
+    runOnOneSignal((OneSignal) => {
+      // getTags() is synchronous (returns the SDK's local cached copy) —
+      // no network round trip, so no try/catch needed here.
+      const tags = OneSignal.User.getTags();
+      setPreference({
+        version: 1,
+        morningEnabled: tags[TAG_KEY.morning] !== TAG_DISABLED_VALUE,
+        eveningEnabled: tags[TAG_KEY.evening] !== TAG_DISABLED_VALUE,
+      });
     });
     // Reconcile once per mount only; every subsequent change goes through
     // setPeriodEnabled below, which keeps the mirror in sync itself.

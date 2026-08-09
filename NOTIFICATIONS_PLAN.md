@@ -292,7 +292,7 @@ Route Handlers (كلها `export const runtime = "nodejs"` صراحة لضمان
   importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js");
   ```
   يدمج منطق push/notificationclick الخاص بـOneSignal داخل نفس الملف الحالي دون استبدال listeners الموجودة (install/activate/fetch/message تبقى كما هي وتعمل بالتوازي — المتصفح يدعم عدة listeners لنفس الحدث). **لا حاجة لكتابة `push`/`notificationclick` يدويًا** — سكربت OneSignal المستورد يوفرهما، بما في ذلك تركيز نافذة مفتوحة بدل فتح نافذة مكررة (سلوك افتراضي عام لـSDK، يُتحقق منه عمليًا في القسم 23).
-- **إعداد المسار المخصص**: بما أن ملفنا فعلًا في الجذر باسم `sw.js` (وليس `OneSignalSDKWorker.js` الافتراضي)، يلزم تفعيل "Customize service worker paths and filenames" في إعدادات OneSignal Dashboard وتمرير `serviceWorkerPath: "sw.js"` ضمن `OneSignal.init()`.
+- **إعداد المسار المخصص**: بما أن ملفنا فعلًا في الجذر باسم `sw.js` (وليس `OneSignalSDKWorker.js` الافتراضي)، يكفي تمرير `serviceWorkerPath: "sw.js"` ضمن `OneSignal.init()` وحده (تحقّق 2026-08-08 من توثيق OneSignal ومتتبّع مشاكل الـSDK: خيار الإعداد البرمجي هذا بديل لتفعيل "Customize service worker paths and filenames" من لوحة OneSignal، وليس شرطًا إضافيًا فوقه).
 - **[components/layout/service-worker-registration.tsx](components/layout/service-worker-registration.tsx)**: لا تغيير في المنطق، لكن **قيد معروف**: هذا الملف يُلغي تسجيل الـSW بالكامل في وضع dev، مما يمنع اختبار push محليًا على `localhost` — الحل: الاختبار يتم على Vercel Preview Deployment (قسم 22/23).
 - **[app/manifest.ts](app/manifest.ts)**: لا تغيير مطلوب (لا حقول يتطلبها Web Push الحديث القائم على VAPID/OneSignal).
 
