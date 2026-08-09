@@ -52,15 +52,17 @@ export function ServiceWorkerRegistration() {
     }
 
     function promptForUpdate(worker: ServiceWorker) {
-      // A stable id makes sonner update the existing toast instead of
-      // stacking a new one — this can fire more than once per session
-      // (registration.waiting on load, then updatefound/statechange
-      // later, or across several reloads before the user acts on it).
       toast("نسخة جديدة من التطبيق متاحة", {
         id: "sw-update-available",
         action: {
           label: "تحديث",
-          onClick: () => worker.postMessage({ type: "SKIP_WAITING" }),
+          onClick: () => {
+            // Dismiss immediately — the reload triggered by controllerchange
+            // (below) will wipe it too, but this avoids any visible lag,
+            // and makes the intent explicit rather than incidental.
+            toast.dismiss("sw-update-available");
+            worker.postMessage({ type: "SKIP_WAITING" });
+          },
         },
         duration: Infinity,
       });
@@ -73,10 +75,16 @@ export function ServiceWorkerRegistration() {
       .then((registration) => {
       if (cancelled) return;
 
-      if (registration.waiting && navigator.serviceWorker.controller) {
-        promptForUpdate(registration.waiting);
-      }
-
+      // Deliberately NOT checking registration.waiting here. That check
+      // used to run on every single page load, and if a worker ever got
+      // stuck in "waiting" for any reason, it would re-show the prompt
+      // forever, every load, with no way to clear itself — the exact bug
+      // reported in testing (toast kept reappearing across many reloads
+      // with no new deploy in between). updatefound below already covers
+      // "a new version was detected during this load" — .register()
+      // itself triggers the browser's own update check as part of its
+      // normal algorithm, so this loses no real detection capability,
+      // only the redundant/unreliable path.
       registration.addEventListener("updatefound", () => {
         const installingWorker = registration.installing;
         if (!installingWorker) return;
