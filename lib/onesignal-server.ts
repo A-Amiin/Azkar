@@ -66,6 +66,18 @@ export function idempotencyKeyFor(slotId: string, date: string): string {
   return uuidv5(`${slotId}:${date}`, IDEMPOTENCY_NAMESPACE);
 }
 
+/** OneSignal rejects a notification with "Message Notifications must have
+ *  Any/English language content" unless an "en" key is present in
+ *  headings/contents — confirmed via a live 400 response, not
+ *  documentation (which didn't mention this requirement at all). This app
+ *  is Arabic-only by design, so "en" duplicates the same Arabic text
+ *  rather than an actual translation — it exists purely to satisfy
+ *  OneSignal's required fallback locale; real delivery still prioritizes
+ *  "ar" for Arabic-locale devices. */
+function localizedText(text: string): { en: string; ar: string } {
+  return { en: text, ar: text };
+}
+
 /** Posts one notification create request to the OneSignal REST API.
  *  Retries once on 429/5xx with a short backoff. Never logs the
  *  Authorization header, the API key, or anything from the outgoing
@@ -136,8 +148,8 @@ export async function sendNotification({
   return postToOneSignal({
     idempotency_key: idempotencyKey,
     filters,
-    headings: { ar: copy.title },
-    contents: { ar: copy.body },
+    headings: localizedText(copy.title),
+    contents: localizedText(copy.body),
     url: copy.url,
     web_push_topic: copy.topic,
     data: copy.data,
@@ -155,7 +167,7 @@ export async function sendTestNotification(
   return postToOneSignal({
     idempotency_key: uuidv4(),
     include_subscription_ids: [subscriptionId],
-    headings: { ar: "🔔 إشعار تجريبي" },
-    contents: { ar: "وصلك هذا الإشعار بنجاح — كل شيء يعمل كما هو متوقع." },
+    headings: localizedText("🔔 إشعار تجريبي"),
+    contents: localizedText("وصلك هذا الإشعار بنجاح — كل شيء يعمل كما هو متوقع."),
   });
 }
