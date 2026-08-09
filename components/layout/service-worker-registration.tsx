@@ -3,11 +3,16 @@
 import { useEffect, useRef } from "react";
 import { toast } from "sonner";
 
-/** Registers /sw.js after mount (never during SSR/build) and surfaces a
- *  "new version available" toast when an update is waiting — the worker
- *  itself never calls skipWaiting() on its own (see public/sw.js), so
- *  nothing swaps under the user without this explicit confirmation. Renders
- *  nothing; this is a pure side-effect component. */
+/** Registers /OneSignalSDKWorker.js after mount (never during SSR/build)
+ *  and surfaces a "new version available" toast when an update is
+ *  waiting — the worker itself never calls skipWaiting() on its own (see
+ *  public/OneSignalSDKWorker.js), so nothing swaps under the user without
+ *  this explicit confirmation. Renders nothing; this is a pure
+ *  side-effect component.
+ *
+ *  Filename note: this used to be /sw.js, renamed to OneSignal's default
+ *  expected filename after `serviceWorkerPath` in OneSignal.init() proved
+ *  unreliable in production — see public/OneSignalSDKWorker.js. */
 export function ServiceWorkerRegistration() {
   const hasReloaded = useRef(false);
 
@@ -59,7 +64,7 @@ export function ServiceWorkerRegistration() {
     let cancelled = false;
 
     navigator.serviceWorker
-      .register("/sw.js", { updateViaCache: "none" })
+      .register("/OneSignalSDKWorker.js", { updateViaCache: "none" })
       .then((registration) => {
       if (cancelled) return;
 

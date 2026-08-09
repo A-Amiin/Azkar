@@ -38,15 +38,16 @@ export function OneSignalInit() {
     runOnOneSignal(async (OneSignal) => {
       await OneSignal.init({
         appId,
-        // Our service worker lives at /sw.js, not OneSignal's default
-        // OneSignalSDKWorker.js — see public/sw.js and
-        // NOTIFICATIONS_PLAN.md section 16. Setting serviceWorkerPath here
-        // is sufficient on its own (confirmed against OneSignal's docs and
-        // SDK issue tracker, 2026-08-08) — the dashboard's "Customize
-        // service worker paths and filenames" toggle is an alternative to
-        // this, not an additional requirement on top of it.
-        serviceWorkerPath: "sw.js",
-        serviceWorkerParam: { scope: "/" },
+        // No serviceWorkerPath/serviceWorkerParam here — public/sw.js was
+        // renamed to public/OneSignalSDKWorker.js precisely so none is
+        // needed. An earlier version of this file passed
+        // serviceWorkerPath: "sw.js" to keep a shorter custom filename;
+        // that was confirmed NOT to work in production (OneSignal.init()
+        // silently ignored it and requested the default filename anyway,
+        // 404ing). Zero-config default naming is what's actually
+        // reliable — see public/OneSignalSDKWorker.js and
+        // NOTIFICATIONS_PLAN.md section 16.
+        //
         // Per OneSignal's Web SDK setup docs: lets Web Push register over
         // plain HTTP on localhost during local development, where there's
         // no HTTPS. Never true in production.
