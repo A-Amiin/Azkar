@@ -95,7 +95,10 @@ export default function RootLayout({ children }: RootLayoutProps) {
           <AppFooter />
         </TooltipProvider>
 
-        <Toaster position="top-center" />
+        <Toaster
+          position="top-center"
+          swipeDirections={["top", "left", "right"]}
+        />
         <FontPreferenceSync />
         <ThemePreferenceSync />
         <ServiceWorkerRegistration />
