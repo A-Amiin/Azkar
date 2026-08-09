@@ -52,7 +52,12 @@ export function ServiceWorkerRegistration() {
     }
 
     function promptForUpdate(worker: ServiceWorker) {
+      // A stable id makes sonner update the existing toast instead of
+      // stacking a new one — this can fire more than once per session
+      // (registration.waiting on load, then updatefound/statechange
+      // later, or across several reloads before the user acts on it).
       toast("نسخة جديدة من التطبيق متاحة", {
+        id: "sw-update-available",
         action: {
           label: "تحديث",
           onClick: () => worker.postMessage({ type: "SKIP_WAITING" }),
