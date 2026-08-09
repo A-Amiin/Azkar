@@ -6,16 +6,20 @@
 //
 // OneSignal's Web Push logic (push + notificationclick listeners, plus its
 // own install/activate handling) is merged into this same file via
-// importScripts rather than registering a second service worker — this
-// app already owns /sw.js at the root, and the browser only allows one
-// active service worker per scope. The browser supports multiple
-// listeners per event type, so OneSignal's install/activate/push/
-// notificationclick handlers below run alongside — not instead of — the
-// caching logic in this file. Because the filename differs from
-// OneSignal's default (OneSignalSDKWorker.js), "Customize service worker
-// paths and filenames" must be enabled in the OneSignal dashboard and
-// `serviceWorkerPath: "sw.js"` passed to OneSignal.init() — see
-// NOTIFICATIONS_PLAN.md section 16.
+// importScripts rather than registering a second service worker — a
+// scope only allows one active service worker, and this file is it. The
+// browser supports multiple listeners per event type, so OneSignal's
+// install/activate/push/notificationclick handlers below run alongside —
+// not instead of — the caching logic in this file.
+//
+// This file is named OneSignalSDKWorker.js (OneSignal's default), NOT
+// something custom like sw.js. An earlier version of this file tried
+// serviceWorkerPath: "sw.js" in OneSignal.init() to keep a shorter custom
+// name — that did NOT work in production: OneSignal.init() ignored the
+// option and requested /OneSignalSDKWorker.js anyway, which 404'd because
+// the file didn't exist there, breaking push entirely (confirmed via a
+// live browser console error, not just documentation). Zero-config default
+// naming is what's actually reliable — see NOTIFICATIONS_PLAN.md section 16.
 importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js");
 //
 // Strategy:

@@ -25,7 +25,8 @@
 
 ## استراتيجية العمل بدون إنترنت (PWA / Offline)
 
-**Service Worker مكتوب يدويًا** في `public/sw.js` — بدون Serwist أو
+**Service Worker مكتوب يدويًا** في `public/OneSignalSDKWorker.js` (كان اسمه
+`public/sw.js` قبل دمج OneSignal — انظر السبب أسفل) — بدون Serwist أو
 next-pwa أو Workbox. توثيق Next.js 16 المرفق (`progressive-web-apps.md`)
 يذكر Serwist كـ"خيار واحد" فقط وليس إلزاميًا، وإضافة إضافة بناء (build
 plugin) فوق تقنية حديثة أصلًا (Next 16.3 + Turbopack + Tailwind v4 +
@@ -46,6 +47,12 @@ base-ui) مخاطرة غير ضرورية لحاجة تخزين مؤقت بسي�
   OneSignalSDK.sw.js")`) مُدمَج في نفس الملف بدل تسجيل service worker ثانٍ
   (نطاق واحد لا يسمح إلا بعامل نشط واحد) — يعمل جنبًا إلى جنب مع منطق
   التخزين المؤقت أعلاه، لا يستبدله.
+- **تصحيح بعد اختبار حقيقي على الإنتاج**: الملف كان اسمه `sw.js` مبدئيًا مع
+  تمرير `serviceWorkerPath: "sw.js"` في `OneSignal.init()`. تبيّن عمليًا
+  (خطأ 404 حقيقي في console الإنتاج) إن `OneSignal.init()` **بيتجاهل**
+  الخيار ده ويطلب دايمًا `OneSignalSDKWorker.js` الافتراضي بصرف النظر —
+  عكس ما أكّدته الوثائق العامة سابقًا. الحل الموثوق فعليًا: تسمية الملف
+  بنفس الاسم الافتراضي مباشرة، بدون أي إعداد إضافي في `OneSignal.init()`.
 
 ## الإشعارات (OneSignal)
 
@@ -140,7 +147,7 @@ lib/            utils · constants · metadata · storage ·
                 onesignal-server · cron-handler (server-only)
 data/           azkar.json · azkar.ts
 types/          azkar.ts · onesignal.d.ts
-public/         sw.js
+public/         OneSignalSDKWorker.js
 ```
 
 مجلدات لم تُنشأ عمدًا (لتفادي مجلدات فارغة): `app/favorites/hooks/`

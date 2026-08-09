@@ -142,7 +142,7 @@
                                  │ Web Push
                                  ▼
                      ┌─────────────────────────┐
-                     │  متصفح المستخدم /public/sw.js│
+                     │  متصفح المستخدم /OneSignalSDKWorker.js│
                      │  (يستورد OneSignal SW script) │
                      └───────────┬─────────────┘
                                  │ click → فتح/تركيز /morning أو /evening
@@ -287,12 +287,12 @@ Route Handlers (كلها `export const runtime = "nodejs"` صراحة لضمان
 
 ## 16. التغييرات المطلوبة في Service Worker والـPWA
 
-- **[public/sw.js](public/sw.js)**: إضافة سطر واحد أعلى الملف:
+- **[public/OneSignalSDKWorker.js](public/OneSignalSDKWorker.js)** (اسمه كان `public/sw.js`، اتغيّر — انظر أسفل): إضافة سطر واحد أعلى الملف:
   ```js
   importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js");
   ```
   يدمج منطق push/notificationclick الخاص بـOneSignal داخل نفس الملف الحالي دون استبدال listeners الموجودة (install/activate/fetch/message تبقى كما هي وتعمل بالتوازي — المتصفح يدعم عدة listeners لنفس الحدث). **لا حاجة لكتابة `push`/`notificationclick` يدويًا** — سكربت OneSignal المستورد يوفرهما، بما في ذلك تركيز نافذة مفتوحة بدل فتح نافذة مكررة (سلوك افتراضي عام لـSDK، يُتحقق منه عمليًا في القسم 23).
-- **إعداد المسار المخصص**: بما أن ملفنا فعلًا في الجذر باسم `sw.js` (وليس `OneSignalSDKWorker.js` الافتراضي)، يكفي تمرير `serviceWorkerPath: "sw.js"` ضمن `OneSignal.init()` وحده (تحقّق 2026-08-08 من توثيق OneSignal ومتتبّع مشاكل الـSDK: خيار الإعداد البرمجي هذا بديل لتفعيل "Customize service worker paths and filenames" من لوحة OneSignal، وليس شرطًا إضافيًا فوقه).
+- **⚠️ تصحيح موثَّق بعد اختبار حقيقي على الإنتاج (2026-08-09)**: الخطة الأصلية هنا كانت تفترض — بناءً على توثيق OneSignal العام ومتتبّع مشاكل الـSDK — أن تمرير `serviceWorkerPath: "sw.js"` وحده داخل `OneSignal.init()` كافٍ لاستخدام اسم ملف مخصّص بدل `OneSignalSDKWorker.js` الافتراضي. **ثبت خطأ هذا الافتراض عمليًا**: ظهر خطأ حقيقي في console الإنتاج (`A bad HTTP response code (404)`) يوضّح أن `OneSignal.init()` **يتجاهل** هذا الخيار فعليًا ويطلب دائمًا `/OneSignalSDKWorker.js` بصرف النظر عن القيمة الممرَّرة. **الحل المُطبَّق فعليًا**: إعادة تسمية الملف إلى `public/OneSignalSDKWorker.js` (اسم OneSignal الافتراضي بالضبط) وحذف `serviceWorkerPath`/`serviceWorkerParam` من `OneSignal.init()` نهائيًا — الاعتماد على السلوك الافتراضي بدون أي إعداد هو المسار الموثوق الوحيد المؤكَّد عمليًا. **الدرس المستفاد**: توثيق OneSignal العام وتتبّع المشاكل على GitHub لا يُغنيان عن اختبار حي فعلي قبل اعتماد سلوك غير افتراضي.
 - **[components/layout/service-worker-registration.tsx](components/layout/service-worker-registration.tsx)**: لا تغيير في المنطق، لكن **قيد معروف**: هذا الملف يُلغي تسجيل الـSW بالكامل في وضع dev، مما يمنع اختبار push محليًا على `localhost` — الحل: الاختبار يتم على Vercel Preview Deployment (قسم 22/23).
 - **[app/manifest.ts](app/manifest.ts)**: لا تغيير مطلوب (لا حقول يتطلبها Web Push الحديث القائم على VAPID/OneSignal).
 
@@ -316,7 +316,7 @@ Route Handlers (كلها `export const runtime = "nodejs"` صراحة لضمان
 |---|---|
 | [next.config.ts](next.config.ts) | إزالة `output: "export"` لتفعيل Route Handlers الديناميكية |
 | [package.json](package.json) | إضافة `adhan` و`uuid` كاعتماديات server-side |
-| [public/sw.js](public/sw.js) | دمج سكربت OneSignal (`importScripts`) |
+| [public/OneSignalSDKWorker.js](public/OneSignalSDKWorker.js) (كان `public/sw.js`) | دمج سكربت OneSignal (`importScripts`) + إعادة تسمية للاسم الافتراضي (انظر التصحيح في القسم 16) |
 | [app/customization/page.tsx](app/customization/page.tsx) | إضافة قسم "الإشعارات" الخامس |
 | [app/layout.tsx](app/layout.tsx) | تحميل مزوّد تهيئة OneSignal SDK (بجانب `<ServiceWorkerRegistration />`) |
 | [app/morning/components/morning-azkar-view.tsx](app/morning/components/morning-azkar-view.tsx) | استدعاء `useMarkPeriodSeen("morning")` عند التحميل |
@@ -486,7 +486,7 @@ export function useMarkPeriodSeen(period: AzkarPeriod) {
 - **Unit tests**: `lib/cairo-time.ts` (حدود النوافذ، تحويل التاريخ)، `lib/prayer-times.ts` (قيمة عصر معقولة لعدة تواريخ عبر السنة)، `buildFilters()` (المخرجات لكل تركيبة تاج).
 - **Integration tests**: استدعاء كل Route Handler محليًا بـmock لـ`fetch` نحو OneSignal، بتغطية: تاج غائب / `"off"` / تاريخ قديم / تاريخ اليوم، والتحقق من الفلتر المُرسَل ومن تخطي الإرسال خارج النافذة.
 - **Browser tests**: تدفق طلب الصلاحية كامل (Chrome desktop + Android)، رفض الصلاحية، تعطيل/تفعيل فترة والتحقق من قيمة التاج عبر OneSignal Dashboard.
-- **PWA tests**: تثبيت على Android (Chrome) وiOS (Add to Home Screen) والتحقق من استلام push في وضع standalone؛ تحديث `sw.js` (SKIP_WAITING) ما زال يعمل بعد دمج `importScripts`.
+- **PWA tests**: تثبيت على Android (Chrome) وiOS (Add to Home Screen) والتحقق من استلام push في وضع standalone؛ تحديث `OneSignalSDKWorker.js` (SKIP_WAITING) ما زال يعمل بعد دمج `importScripts`.
 - **OneSignal sandbox/test-device**: إنشاء عدة اشتراكات اختبار بقيم تاج مختلفة يدويًا من لوحة OneSignal، وتشغيل الفلترين يدويًا (Postman/REST) للتحقق الفعلي من **الافتراض غير الموثّق في القسم 11** (تعامل `not_exists` مع `OR`/`AND` المتسلسل) قبل الإطلاق.
 - **Mobile/Desktop**: التحقق من ظهور نص عربي RTL صحيح في الإشعار على Android وWindows/macOS Chrome.
 
