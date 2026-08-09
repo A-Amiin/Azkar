@@ -401,6 +401,9 @@ export async function GET(req: NextRequest) {
 ```
 
 **`lib/onesignal-server.ts`**
+
+> ⚠️ **تصحيح موثَّق بعد اختبار حقيقي على الإنتاج (2026-08-09)**: الـpseudocode أسفله (وأي مكان آخر في هذه الخطة) يوضّح `headings`/`contents` بمفتاح `ar` فقط. **هذا غير كافٍ فعليًا**: OneSignal يرفض أي إرسال بدون مفتاح `en` أيضًا برسالة `"Message Notifications must have Any/English language content"` — خطأ 400 حقيقي وُوجِه أثناء اختبار زر الإشعار التجريبي، وغير موثَّق في أي صفحة من صفحات OneSignal الرسمية التي رُوجعت. التطبيق الفعلي (`lib/onesignal-server.ts`) يستخدم دالة `localizedText(text)` تُكرّر نفس النص العربي تحت المفتاحين `en` و`ar` معًا (التطبيق عربي بالكامل بلا محتوى إنجليزي فعلي؛ `en` موجود فقط لإرضاء تحقّق OneSignal الإلزامي). **هذا الخطأ كان سيمنع الإرسال بالكامل لكل التذكيرات الأربعة المجدولة**، وليس فقط زر الاختبار — نفس منطق `headings`/`contents` مشترك بين الاثنين.
+
 ```ts
 export function buildFilters(tagKey: string, opts: { excludeToday: boolean }) {
   const filters: unknown[] = [
