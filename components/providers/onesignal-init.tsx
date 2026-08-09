@@ -2,7 +2,11 @@
 
 import { useEffect } from "react";
 import Script from "next/script";
-import { ONESIGNAL_APP_ID, runOnOneSignal } from "@/lib/onesignal-client";
+import {
+  ONESIGNAL_APP_ID,
+  isOneSignalConfigured,
+  runOnOneSignal,
+} from "@/lib/onesignal-client";
 
 // Module-level, not component state: React's Strict Mode intentionally
 // double-invokes effects in development (mount → cleanup → mount again) to
@@ -25,7 +29,11 @@ let hasInitialized = false;
  *  renders nothing and the rest of the app is unaffected. */
 export function OneSignalInit() {
   useEffect(() => {
-    if (!ONESIGNAL_APP_ID || hasInitialized) return;
+    // A OneSignal web App ID only works on the exact Site URL configured in
+    // its dashboard. In particular, allowLocalhostAsSecureOrigin does not
+    // make a production App ID valid on localhost. Skipping initialization
+    // here keeps development and Vercel preview origins free of SDK errors.
+    if (!ONESIGNAL_APP_ID || !isOneSignalConfigured() || hasInitialized) return;
     hasInitialized = true;
     // Captured locally: TS doesn't carry the guard's narrowing of an
     // imported binding across the closure below.

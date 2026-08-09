@@ -15,8 +15,36 @@ import type { OneSignalSDK } from "@/types/onesignal";
  *  onesignal-init.tsx, hooks/use-notification-permission.ts) agrees. */
 export const ONESIGNAL_APP_ID = process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID;
 
+/** OneSignal web apps are bound to the exact Site URL configured in their
+ * dashboard. The production App ID therefore must not be initialized on
+ * localhost or on a Vercel preview deployment. A separate OneSignal app can
+ * opt into local testing explicitly. */
+const ONESIGNAL_SITE_ORIGIN =
+  process.env.NEXT_PUBLIC_ONESIGNAL_SITE_ORIGIN ??
+  "https://azkkar.vercel.app";
+const ONESIGNAL_ENABLE_LOCALHOST =
+  process.env.NEXT_PUBLIC_ONESIGNAL_ENABLE_LOCALHOST === "true";
+
+function isLocalhost(hostname: string): boolean {
+  return hostname === "localhost" || hostname === "127.0.0.1" || hostname === "[::1]";
+}
+
+export function isOneSignalOriginAllowed(): boolean {
+  if (typeof window === "undefined") return false;
+
+  if (isLocalhost(window.location.hostname)) {
+    return ONESIGNAL_ENABLE_LOCALHOST;
+  }
+
+  try {
+    return window.location.origin === new URL(ONESIGNAL_SITE_ORIGIN).origin;
+  } catch {
+    return false;
+  }
+}
+
 export function isOneSignalConfigured(): boolean {
-  return Boolean(ONESIGNAL_APP_ID);
+  return Boolean(ONESIGNAL_APP_ID) && isOneSignalOriginAllowed();
 }
 
 export function runOnOneSignal(
