@@ -1,10 +1,12 @@
 /**
  * Minimal hand-written typings for the OneSignal Web SDK v16 (loaded from
  * the CDN, not an npm package — see components/providers/onesignal-init.tsx).
- * Only covers the surface this app actually calls. Property names verified
- * against OneSignal's public docs/examples as of 2026-08-08; the exact
- * shape of `PushSubscription` should be double-checked against a real
- * OneSignal app during initial testing (NOTIFICATIONS_PLAN.md section 23).
+ * Only covers the surface this app actually calls. Verified directly
+ * against the SDK's own TypeScript source
+ * (OneSignal/OneSignal-Website-SDK, NotificationsNamespace.ts /
+ * UserNamespace.ts) as of 2026-08-08 — notably getTags() is synchronous
+ * (returns `{ [key: string]: string }` directly, not a Promise), unlike
+ * an earlier version of this file assumed.
  */
 
 export {};
@@ -23,7 +25,9 @@ interface OneSignalUserNamespace {
   addTags(tags: OneSignalTags): void;
   removeTag(key: string): void;
   removeTags(keys: string[]): void;
-  getTags(): Promise<OneSignalTags>;
+  /** Synchronous — returns the SDK's local cached copy of the tags, not a
+   *  Promise. */
+  getTags(): OneSignalTags;
   PushSubscription: OneSignalPushSubscription;
 }
 
@@ -39,6 +43,10 @@ export interface OneSignalSDK {
     appId: string;
     serviceWorkerPath?: string;
     serviceWorkerParam?: { scope: string };
+    /** Lets Web Push register over plain HTTP on localhost/127.0.0.1 for
+     *  local development — per OneSignal's official Web SDK setup guide.
+     *  Never set true outside development. */
+    allowLocalhostAsSecureOrigin?: boolean;
   }): Promise<void>;
   User: OneSignalUserNamespace;
   Notifications: OneSignalNotificationsNamespace;

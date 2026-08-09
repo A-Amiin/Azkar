@@ -24,16 +24,12 @@ export function useMarkPeriodSeen(period: AzkarPeriod) {
   useEffect(() => {
     if (!isWithinPeriodWindow(period)) return;
 
-    runOnOneSignal(async (OneSignal) => {
+    runOnOneSignal((OneSignal) => {
       if (!OneSignal.Notifications.permission) return;
 
+      // getTags() is synchronous (local cached copy, no network round trip).
       const tagKey = TAG_KEY[period];
-      let currentValue: string | undefined;
-      try {
-        currentValue = (await OneSignal.User.getTags())[tagKey];
-      } catch {
-        return; // Offline/transient SDK error — nothing to mark, safely skip.
-      }
+      const currentValue = OneSignal.User.getTags()[tagKey];
 
       if (currentValue === TAG_DISABLED_VALUE) return;
 
