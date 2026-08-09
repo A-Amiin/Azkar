@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import { runOnOneSignal } from "@/lib/onesignal-client";
+import { isOneSignalConfigured, runOnOneSignalWithTimeout } from "@/lib/onesignal-client";
 
 interface UseSendTestNotificationResult {
   isSending: boolean;
@@ -25,12 +25,16 @@ export function useSendTestNotification(): UseSendTestNotificationResult {
     setSuccess(false);
     setIsSending(true);
 
+    if (!isOneSignalConfigured()) {
+      setError("نظام الإشعارات غير مُفعَّل على هذا الموقع بعد.");
+      setIsSending(false);
+      return;
+    }
+
     try {
-      const subscriptionId = await new Promise<string | null>((resolve) => {
-        runOnOneSignal((OneSignal) => {
-          resolve(OneSignal.User.PushSubscription.id);
-        });
-      });
+      const subscriptionId = await runOnOneSignalWithTimeout(
+        async (OneSignal) => OneSignal.User.PushSubscription.id
+      );
 
       if (!subscriptionId) {
         setError("لا يوجد اشتراك إشعارات نشط على هذا الجهاز بعد.");
@@ -54,7 +58,9 @@ export function useSendTestNotification(): UseSendTestNotificationResult {
 
       setSuccess(true);
     } catch {
-      setError("تعذّر الاتصال بالخادم. تحقّق من اتصالك بالإنترنت.");
+      setError(
+        "تعذّر الاتصال بخدمة الإشعارات أو بالخادم. تحقّق من اتصالك بالإنترنت وحاول مرة أخرى."
+      );
     } finally {
       setIsSending(false);
     }

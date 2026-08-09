@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useState, useSyncExternalStore } from "react";
-import { runOnOneSignal } from "@/lib/onesignal-client";
+import { isOneSignalConfigured, runOnOneSignalWithTimeout } from "@/lib/onesignal-client";
 
 export type NotificationSupportStatus =
   | "unsupported"
@@ -73,17 +73,24 @@ export function useNotificationPermission(): UseNotificationPermissionResult {
       return false;
     }
 
+    // Fails fast with a clear message instead of hanging forever waiting
+    // on a queue that will never drain — see the incident that prompted
+    // this: without NEXT_PUBLIC_ONESIGNAL_APP_ID, components/providers/
+    // onesignal-init.tsx never loads the SDK script at all, so the old
+    // code (no config check, no timeout) spun on "جارٍ التفعيل..." with
+    // no way out.
+    if (!isOneSignalConfigured()) {
+      setError(
+        "نظام الإشعارات غير مُفعَّل على هذا الموقع بعد. إن كنت المطوّر، راجع NOTIFICATIONS_PLAN.md لإعداد OneSignal."
+      );
+      return false;
+    }
+
     setIsRequesting(true);
     try {
-      const granted = await new Promise<boolean>((resolve, reject) => {
-        runOnOneSignal(async (OneSignal) => {
-          try {
-            resolve(await OneSignal.Notifications.requestPermission());
-          } catch (sdkError) {
-            reject(sdkError);
-          }
-        });
-      });
+      const granted = await runOnOneSignalWithTimeout((OneSignal) =>
+        OneSignal.Notifications.requestPermission()
+      );
 
       if (!granted) {
         setError(
@@ -92,7 +99,9 @@ export function useNotificationPermission(): UseNotificationPermissionResult {
       }
       return granted;
     } catch {
-      setError("تعذّر تفعيل الإشعارات. تحقّق من اتصالك بالإنترنت وحاول مرة أخرى.");
+      setError(
+        "تعذّر الاتصال بخدمة الإشعارات. تحقّق من اتصالك بالإنترنت (أو أنّ أداة حظر الإعلانات لا تمنع cdn.onesignal.com) وحاول مرة أخرى."
+      );
       return false;
     } finally {
       setIsRequesting(false);

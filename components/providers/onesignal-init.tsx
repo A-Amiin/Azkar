@@ -2,9 +2,7 @@
 
 import { useEffect } from "react";
 import Script from "next/script";
-import { runOnOneSignal } from "@/lib/onesignal-client";
-
-const ONESIGNAL_APP_ID = process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID;
+import { ONESIGNAL_APP_ID, runOnOneSignal } from "@/lib/onesignal-client";
 
 /** Loads and initializes the OneSignal Web SDK, mirroring the pattern used
  *  by ServiceWorkerRegistration: a side-effect-only component rendered
@@ -20,6 +18,9 @@ const ONESIGNAL_APP_ID = process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID;
 export function OneSignalInit() {
   useEffect(() => {
     if (!ONESIGNAL_APP_ID) return;
+    // Captured locally: TS doesn't carry the guard's narrowing of an
+    // imported binding across the closure below.
+    const appId = ONESIGNAL_APP_ID;
 
     // Push the init call onto the deferred queue *before* the SDK script
     // necessarily finishes loading — this is OneSignal's documented
@@ -27,7 +28,7 @@ export function OneSignalInit() {
     // regardless of the order these two things happen in.
     runOnOneSignal(async (OneSignal) => {
       await OneSignal.init({
-        appId: ONESIGNAL_APP_ID,
+        appId,
         // Our service worker lives at /sw.js, not OneSignal's default
         // OneSignalSDKWorker.js — see public/sw.js and
         // NOTIFICATIONS_PLAN.md section 16. Requires "Customize service
