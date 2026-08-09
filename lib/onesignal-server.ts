@@ -68,10 +68,16 @@ export function idempotencyKeyFor(slotId: string, date: string): string {
 
 /** Posts one notification create request to the OneSignal REST API.
  *  Retries once on 429/5xx with a short backoff. Never logs the
- *  Authorization header, the API key, or the response body (which could
- *  echo back request data). Shared by both sendNotification() (the
- *  scheduled reminders, targeted by `filters`) and
- *  sendTestNotification() (targeted at exactly one subscription). */
+ *  Authorization header, the API key, or anything from the outgoing
+ *  request body. On failure, DOES log OneSignal's own JSON error body
+ *  (e.g. `{"errors":["..."]}`) — that's a validation message describing
+ *  what's wrong with the request shape, not a secret, and it's the only
+ *  practical way to diagnose a 400 without guessing at field names again
+ *  (see the 2026-08-09 service-worker-filename incident in
+ *  NOTIFICATIONS_PLAN.md section 16 — OneSignal's own docs were wrong
+ *  once already today). Shared by both sendNotification() (the scheduled
+ *  reminders, targeted by `filters`) and sendTestNotification() (targeted
+ *  at exactly one subscription). */
 async function postToOneSignal(
   body: Record<string, unknown>
 ): Promise<{ ok: boolean; status: number }> {
@@ -104,7 +110,10 @@ async function postToOneSignal(
   }
 
   if (!response.ok) {
-    console.error(`OneSignal notification send failed: HTTP ${response.status}`);
+    const errorBody = await response.text().catch(() => "<unreadable body>");
+    console.error(
+      `OneSignal notification send failed: HTTP ${response.status} — ${errorBody}`
+    );
   }
 
   return { ok: response.ok, status: response.status };
